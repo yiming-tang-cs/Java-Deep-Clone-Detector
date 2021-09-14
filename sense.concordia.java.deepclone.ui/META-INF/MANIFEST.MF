@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Ui
-Bundle-SymbolicName: sense.concordia.java.deepclone.ui
+Bundle-SymbolicName: sense.concordia.java.deepclone.ui;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Automatic-Module-Name: sense.concordia.java.deepclone.ui
 Bundle-RequiredExecutionEnvironment: JavaSE-12

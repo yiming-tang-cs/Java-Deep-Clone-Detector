@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+   <extension
+         point="org.eclipse.ltk.core.refactoring.refactoringContributions">
+      <contribution
+            class="sense.concordia.java.deepclone.core.contributions.cloenDetectionContributions"
+            id="org.eclipse.java.deepclone.contribution">
+      </contribution>
+   </extension>
+
+</plugin>

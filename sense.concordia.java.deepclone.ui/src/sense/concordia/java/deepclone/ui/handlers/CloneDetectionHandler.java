@@ -16,7 +16,6 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 import sense.concordia.java.deepclone.ui.messages.*;
-//import edu.cuny.hunter.log.ui.wizards.LogWizard;
 
 /**
  * Our sample handler extends AbstractHandler, an IHandler base class.
@@ -49,7 +48,8 @@ public class CloneDetectionHandler extends AbstractHandler {
 
 			if (javaProjectSet.isEmpty())
 				MessageDialog.openError(shell, Messages.Name, Messages.NoProjects);
-//				else
+			else
+				System.out.println();
 //					LogWizard.startRefactoring(javaProjectSet.toArray(new IJavaProject[javaProjectSet.size()]),
 //							shell, Optional.empty());
 		}
