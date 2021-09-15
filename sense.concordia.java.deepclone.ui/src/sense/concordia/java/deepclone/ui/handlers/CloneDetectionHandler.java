@@ -54,7 +54,8 @@ public class CloneDetectionHandler extends AbstractHandler {
 				if (javaProjectSet.isEmpty())
 					MessageDialog.openError(shell, Messages.Name, Messages.NoProjects);
 				else {
-					Util.createDeepCloneProcessor(javaProjectSet.toArray(new IJavaProject[javaProjectSet.size()]));
+					Util.deepclonedetect(javaProjectSet.toArray(new IJavaProject[javaProjectSet.size()]));
+					
 				}
 
 			} catch (JavaModelException e) {
