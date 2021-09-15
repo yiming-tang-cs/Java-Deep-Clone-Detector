@@ -10,3 +10,4 @@ Require-Bundle: org.eclipse.ltk.core.refactoring;bundle-version="3.11.400",
 Import-Package: org.eclipse.jdt.core,
  org.eclipse.jdt.core.dom,
  org.eclipse.jdt.internal.corext.refactoring.util
+Export-Package: sense.concordia.java.deepclone.core.util

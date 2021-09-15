@@ -15,7 +15,22 @@ public class JavaDeepCloneProcessor {
 	
 	private IJavaProject[] javaProjects;
 	
-	public RefactoringStatus checkFinalConditions() throws JavaModelException {
+	/**
+	 * Constructor. 
+	 * @param javaProjects: the selected java projects.
+	 */
+	public JavaDeepCloneProcessor(IJavaProject[] javaProjects) {
+		this.javaProjects = javaProjects;
+	}
+	
+
+	/**
+	 * The method to process the selected projects.
+	 * It analyzes the AST of each files and visits each AST node.
+	 * @return a status of detection.
+	 * @throws JavaModelException
+	 */
+	public RefactoringStatus process() throws JavaModelException {
 
 		final RefactoringStatus status = new RefactoringStatus();
 
