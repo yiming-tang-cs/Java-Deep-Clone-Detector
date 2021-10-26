@@ -22,12 +22,8 @@ Below is a table listing all possible Java deep clone types this tool can detect
 <td>
 <pre>
 @Override
-public Object clone() {
-    try {
-        return (Address) super.clone();
-    } catch (CloneNotSupportedException e) {
-        return new Address(this.street, this.getCity(), this.getCountry());
-    }
+protected Object clone() throws CloneNotSupportedException {
+    return super.clone();
 }
 </pre>
 </td>
