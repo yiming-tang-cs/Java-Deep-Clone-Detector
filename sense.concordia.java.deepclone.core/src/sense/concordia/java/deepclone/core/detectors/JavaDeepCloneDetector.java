@@ -10,8 +10,11 @@ public class JavaDeepCloneDetector extends ASTVisitor {
 	private HashSet<JavaDeepCloneResults> results = new HashSet<>();
 
 	public void detect() {
-		results.forEach(
-				r -> System.out.println(r.getSubject() + ": " + r.getType() + ", " + r.getFile() + ", " + r.getLine()));
+		results.forEach(r -> {
+			System.out.println(r.getSubject() + ": " + r.getType() + ", " + r.getFile() + ", " + r.getLine());
+			System.out.println(r.getEnclosingMethod());
+			System.out.println();
+		});
 	}
 
 	@Override
@@ -24,8 +27,8 @@ public class JavaDeepCloneDetector extends ASTVisitor {
 	}
 
 	/**
-	 * Check whether a method is used to clone objects.
-	 * May need to improve.
+	 * Check whether a method is used to clone objects. May need to improve.
+	 * 
 	 * @param method
 	 * @return True/False
 	 */

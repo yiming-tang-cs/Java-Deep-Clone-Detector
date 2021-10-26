@@ -1,10 +1,15 @@
 package sense.concordia.java.deepclone.core.detectors;
 
+import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
+import org.eclipse.jdt.internal.corext.dom.ASTNodes;
 
+@SuppressWarnings("restriction")
 public class JavaDeepCloneResults {
 	private JavaDeepCloneType type;
+	private String enclosingMethod;
 	private String subject;
 	private String file;
 	private int line;
@@ -13,8 +18,11 @@ public class JavaDeepCloneResults {
 		this.setType(type);
 		CompilationUnit cu = (CompilationUnit) method.getRoot();
 		this.setSubject(cu.getJavaElement().getJavaProject().getElementName());
-		this.file = cu.getJavaElement().getPath().makeAbsolute().toString();
-		this.line = cu.getLineNumber(method.getStartPosition());
+		this.setFile(cu.getJavaElement().getPath().makeAbsolute().toString());
+		this.setLine(cu.getLineNumber(method.getStartPosition()));
+
+		this.setEnclosingMethod(
+				((MethodDeclaration) ASTNodes.getParent(method, ASTNode.METHOD_DECLARATION)).toString());
 	}
 
 	public JavaDeepCloneType getType() {
@@ -47,6 +55,14 @@ public class JavaDeepCloneResults {
 
 	public void setSubject(String subject) {
 		this.subject = subject;
+	}
+
+	public String getEnclosingMethod() {
+		return enclosingMethod;
+	}
+
+	public void setEnclosingMethod(String enclosingMethod) {
+		this.enclosingMethod = enclosingMethod;
 	}
 
 }
