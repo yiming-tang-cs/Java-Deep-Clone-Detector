@@ -28,6 +28,7 @@ public Object clone() {
     } catch (CloneNotSupportedException e) {
         return new Address(this.street, this.getCity(), this.getCountry());
     }
+}
 </pre>
 </td>
 </tr>
