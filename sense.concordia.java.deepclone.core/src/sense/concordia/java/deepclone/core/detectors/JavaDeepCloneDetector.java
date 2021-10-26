@@ -23,11 +23,16 @@ public class JavaDeepCloneDetector extends ASTVisitor {
 		return super.visit(method);
 	}
 
+	/**
+	 * Check whether a method is used to clone objects.
+	 * May need to improve.
+	 * @param method
+	 * @return True/False
+	 */
 	private boolean isCloneMethod(MethodInvocation method) {
-		if (method.getName().equals("clone")) {
-			if (method.resolveMethodBinding().getMethodDeclaration().toString().contains("super.clone()"))
-				return true;
-		}
+		if (method.getName().toString().equals("clone"))
+			return true;
+
 		return false;
 	}
 
