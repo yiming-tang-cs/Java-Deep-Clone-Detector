@@ -7,7 +7,7 @@ import org.eclipse.jdt.core.dom.MethodInvocation;
 
 public class JavaDeepCloneDetector extends ASTVisitor {
 
-	private HashSet<JavaDeepCloneResults> results = new HashSet<>();
+	private HashSet<JavaDeepCloneResult> results = new HashSet<>();
 
 	public void detect() {
 		results.forEach(r -> {
@@ -39,16 +39,16 @@ public class JavaDeepCloneDetector extends ASTVisitor {
 		return false;
 	}
 
-	public HashSet<JavaDeepCloneResults> getResults() {
+	public HashSet<JavaDeepCloneResult> getResults() {
 		return results;
 	}
 
-	public void setResults(HashSet<JavaDeepCloneResults> results) {
+	public void setResults(HashSet<JavaDeepCloneResult> results) {
 		this.results = results;
 	}
 
 	private void addResult(MethodInvocation method, JavaDeepCloneType type) {
-		JavaDeepCloneResults newResult = new JavaDeepCloneResults(method, type);
+		JavaDeepCloneResult newResult = new JavaDeepCloneResult(method, type);
 		results.add(newResult);
 	}
 

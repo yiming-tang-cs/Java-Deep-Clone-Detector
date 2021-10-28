@@ -7,14 +7,14 @@ import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.internal.corext.dom.ASTNodes;
 
 @SuppressWarnings("restriction")
-public class JavaDeepCloneResults {
+public class JavaDeepCloneResult {
 	private JavaDeepCloneType type;
 	private String enclosingMethod;
 	private String subject;
 	private String file;
 	private int line;
 
-	public JavaDeepCloneResults(MethodInvocation method, JavaDeepCloneType type) {
+	public JavaDeepCloneResult(MethodInvocation method, JavaDeepCloneType type) {
 		this.setType(type);
 		CompilationUnit cu = (CompilationUnit) method.getRoot();
 		this.setSubject(cu.getJavaElement().getJavaProject().getElementName());
