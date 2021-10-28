@@ -1,16 +1,26 @@
 package sense.concordia.java.deepclone.tests;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.tools.JavaCompiler;
+import javax.tools.ToolProvider;
+
 import org.junit.Test;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
+import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTParser;
@@ -33,6 +43,38 @@ public class CloneDetectionTest extends GenericRefactoringTest {
 	
 	public CloneDetectionTest() {
 		rts= new RefactoringTestSetup();
+	}
+	
+	/**
+	 * Compile the test case
+	 */
+	private static boolean compiles(String source, Path path) throws IOException {
+		// Save source in .java file.
+		File sourceFile = new File(path.toFile(), "bin/p/A.java");
+		sourceFile.getParentFile().mkdirs();
+		Files.write(sourceFile.toPath(), source.getBytes());
+
+		// Compile source file.
+		JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+		boolean compileSuccess = compiler.run(null, null, null, sourceFile.getPath()) == 0;
+
+		sourceFile.delete();
+		return compileSuccess;
+	}
+	
+	@Override
+	protected ICompilationUnit createCUfromTestFile(IPackageFragment pack, String cuName) throws Exception {
+
+		ICompilationUnit unit = super.createCUfromTestFile(pack, cuName);
+		
+		if (!unit.isStructureKnown())
+			throw new IllegalArgumentException(cuName + " has structural errors.");
+
+		Path directory = Paths.get(unit.getParent().getParent().getParent().getResource().getLocation().toString());
+
+		assertTrue("Should compile the testing cases:", compiles(unit.getSource(), directory));
+
+		return unit;
 	}
 
 	/**
