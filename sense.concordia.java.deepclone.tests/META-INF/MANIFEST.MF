@@ -9,7 +9,8 @@ Require-Bundle: org.junit,
  org.eclipse.ltk.core.refactoring;bundle-version="3.11.400",
  org.eclipse.jdt.ui.tests.refactoring;bundle-version="3.13.1400",
  sense.concordia.java.deepclone.core,
- org.eclipse.core.resources;bundle-version="3.15.0"
+ org.eclipse.core.resources;bundle-version="3.15.0",
+ org.eclipse.osgi;bundle-version="3.16.300"
 Import-Package: org.eclipse.core.runtime;version="3.7.0",
  org.eclipse.jdt.core,
  org.eclipse.jdt.core.dom
