@@ -4,7 +4,7 @@ class A implements Cloneable {
 	int rollno;
 	String name;
 
-	Student18(int rollno, String name) {
+	A(int rollno, String name) {
 		this.rollno = rollno;
 		this.name = name;
 	}
