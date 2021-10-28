@@ -1,6 +1,11 @@
 package sense.concordia.java.deepclone.tests;
 
+import static org.junit.Assert.assertEquals;
+
+import java.util.Collections;
+import java.util.EnumSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -15,6 +20,7 @@ import org.junit.Assert;
 
 import sense.concordia.java.deepclone.core.detectors.JavaDeepCloneDetector;
 import sense.concordia.java.deepclone.core.detectors.JavaDeepCloneResult;
+import sense.concordia.java.deepclone.core.detectors.JavaDeepCloneType;
 
 @SuppressWarnings("restriction")
 public class CloneDetectionTests extends GenericRefactoringTest {
@@ -38,18 +44,23 @@ public class CloneDetectionTests extends GenericRefactoringTest {
 		JavaDeepCloneDetector detector = new JavaDeepCloneDetector();
 		ast.accept(detector);
 
+		// Get sets of actual results.
 		Set<JavaDeepCloneResult> results = detector.getResults();
+		Set<JavaDeepCloneType> types = results.stream().map(r -> r.getType()).collect(Collectors.toSet());
+		Set<String> cloneLocations = results.stream().map(r -> r.getFile() + ": " +r.getLine()).collect(Collectors.toSet());
 
-		Assert.assertNotEquals("Result is empty", 0, results.size());
-		
+		assertEquals("Result is empty!", 0, results.size());	
+		assertEquals("Result size is unexpected!", expectedResults.length, results.size());
+
 		for (CloneDetectionExpectedResult expectedResult : expectedResults) {
-			// Todo
+			assertEquals(expectedResult.getTypes(), types);
+			assertEquals(expectedResult.getCloneLocations(), cloneLocations);
 		}
 
 	}
-	
+
 	public void testCloneableInterface() throws Exception {
-		this.helper(new CloneDetectionExpectedResult());
+		this.helper(new CloneDetectionExpectedResult(EnumSet.of(JavaDeepCloneType.CLONE_METHOD), Collections.singleton("")));
 	}
 
 }
