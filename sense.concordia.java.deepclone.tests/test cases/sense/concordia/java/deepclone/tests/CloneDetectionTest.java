@@ -1,6 +1,5 @@
 package sense.concordia.java.deepclone.tests;
 
-import org.junit.Rule;
 import org.junit.Test;
 
 import java.util.Set;
@@ -43,20 +42,20 @@ public class CloneDetectionTest extends GenericRefactoringTest {
 	public CloneDetectionTest() {
 		rts = new RefactoringTestSetup();
 	}
-	
+
 	protected CloneDetectionTest(RefactoringTestSetup rts) {
-		this.rts= rts;
+		this.rts = rts;
 	}
 
 	protected String getRefactoringPath() {
 		return REFACTORING_PATH;
 	}
-	
+
 	@Override
 	protected ICompilationUnit createCUfromTestFile(IPackageFragment pack, String cuName) throws Exception {
 
 		ICompilationUnit unit = super.createCUfromTestFile(pack, cuName);
-		
+
 		if (!unit.isStructureKnown())
 			throw new IllegalArgumentException(cuName + " has structural errors.");
 
@@ -66,7 +65,7 @@ public class CloneDetectionTest extends GenericRefactoringTest {
 
 		return unit;
 	}
-	
+
 	/**
 	 * Compile the test case
 	 */
@@ -104,13 +103,14 @@ public class CloneDetectionTest extends GenericRefactoringTest {
 
 		// Get sets of actual results.
 		Set<JavaDeepCloneResult> results = detector.getResults();
-		
+
 		// Check the result size.
-		assertEquals("Result is empty!", 0, results.size());
+		assertNotEquals("Result is empty!", 0, results.size());
 		assertEquals("Result size is unexpected!", expectedResults.length, results.size());
-		
+
 		Set<JavaDeepCloneType> types = results.stream().map(r -> r.getType()).collect(Collectors.toSet());
-		Set<String> cloneLocations = results.stream().map(r -> r.getFile() + ": " + r.getLine())
+		Set<String> cloneLocations = results.stream()
+				.map(r -> r.getFile().substring(r.getFile().lastIndexOf('/') + 1) + ": " + r.getLine())
 				.collect(Collectors.toSet());
 
 		for (CloneDetectionExpectedResult expectedResult : expectedResults) {
@@ -123,9 +123,9 @@ public class CloneDetectionTest extends GenericRefactoringTest {
 	@Test
 	public void testCloneableInterface() throws Exception {
 		this.helper(new CloneDetectionExpectedResult(EnumSet.of(JavaDeepCloneType.CLONE_METHOD),
-				Collections.singleton("")));
+				Collections.singleton("A.java: 20")));
 	}
-	
+
 	/*
 	 * This method could fix the issue that the bundle has no entry.
 	 */

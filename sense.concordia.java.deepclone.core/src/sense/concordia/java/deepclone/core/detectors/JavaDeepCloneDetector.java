@@ -40,7 +40,7 @@ public class JavaDeepCloneDetector extends ASTVisitor {
 	}
 
 	public HashSet<JavaDeepCloneResult> getResults() {
-		return results;
+		return this.results;
 	}
 
 	public void setResults(HashSet<JavaDeepCloneResult> results) {
