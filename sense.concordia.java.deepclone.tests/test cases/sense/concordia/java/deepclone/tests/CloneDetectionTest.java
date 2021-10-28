@@ -15,6 +15,9 @@ import java.util.Collections;
 
 import java.util.stream.Collectors;
 
+import javax.tools.JavaCompiler;
+import javax.tools.ToolProvider;
+
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTParser;
@@ -27,8 +30,8 @@ import static org.junit.Assert.*;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
+import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.ui.tests.refactoring.GenericRefactoringTest;
-import org.eclipse.jdt.ui.tests.refactoring.infra.RefactoringTestPlugin;
 import org.eclipse.jdt.ui.tests.refactoring.rules.RefactoringTestSetup;
 
 @SuppressWarnings("restriction")
@@ -48,6 +51,38 @@ public class CloneDetectionTest extends GenericRefactoringTest {
 	protected String getRefactoringPath() {
 		return REFACTORING_PATH;
 	}
+	
+	@Override
+	protected ICompilationUnit createCUfromTestFile(IPackageFragment pack, String cuName) throws Exception {
+
+		ICompilationUnit unit = super.createCUfromTestFile(pack, cuName);
+		
+		if (!unit.isStructureKnown())
+			throw new IllegalArgumentException(cuName + " has structural errors.");
+
+		Path directory = Paths.get(unit.getParent().getParent().getParent().getResource().getLocation().toString());
+
+		assertTrue("Should compile the testing cases:", compiles(unit.getSource(), directory));
+
+		return unit;
+	}
+	
+	/**
+	 * Compile the test case
+	 */
+	protected static boolean compiles(String source, Path path) throws IOException {
+		// Save source in .java file.
+		File sourceFile = new File(path.toFile(), "bin/p/A.java");
+		sourceFile.getParentFile().mkdirs();
+		Files.write(sourceFile.toPath(), source.getBytes());
+
+		// Compile source file.
+		JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+		boolean compileSuccess = compiler.run(null, null, null, sourceFile.getPath()) == 0;
+
+		sourceFile.delete();
+		return compileSuccess;
+	}
 
 	/**
 	 * Core test method.
@@ -56,7 +91,7 @@ public class CloneDetectionTest extends GenericRefactoringTest {
 	 * @throws Exception
 	 */
 	private void helper(CloneDetectionExpectedResult... expectedResults) throws Exception {
-		ICompilationUnit cu = createCUfromTestFile(getPackageP(), "A");
+		ICompilationUnit cu = this.createCUfromTestFile(getPackageP(), "A");
 
 		ASTParser parser = ASTParser.newParser(AST.JLS15);
 		parser.setResolveBindings(true);
@@ -69,12 +104,14 @@ public class CloneDetectionTest extends GenericRefactoringTest {
 
 		// Get sets of actual results.
 		Set<JavaDeepCloneResult> results = detector.getResults();
+		
+		// Check the result size.
+		assertEquals("Result is empty!", 0, results.size());
+		assertEquals("Result size is unexpected!", expectedResults.length, results.size());
+		
 		Set<JavaDeepCloneType> types = results.stream().map(r -> r.getType()).collect(Collectors.toSet());
 		Set<String> cloneLocations = results.stream().map(r -> r.getFile() + ": " + r.getLine())
 				.collect(Collectors.toSet());
-
-		assertEquals("Result is empty!", 0, results.size());
-		assertEquals("Result size is unexpected!", expectedResults.length, results.size());
 
 		for (CloneDetectionExpectedResult expectedResult : expectedResults) {
 			assertEquals(expectedResult.getTypes(), types);
