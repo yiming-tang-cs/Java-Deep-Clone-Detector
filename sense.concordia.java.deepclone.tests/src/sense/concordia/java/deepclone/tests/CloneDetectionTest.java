@@ -7,8 +7,7 @@ import java.util.EnumSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.junit.Test;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
@@ -16,14 +15,25 @@ import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.ui.tests.refactoring.GenericRefactoringTest;
-import org.junit.Assert;
+import org.eclipse.jdt.ui.tests.refactoring.rules.RefactoringTestSetup;
 
 import sense.concordia.java.deepclone.core.detectors.JavaDeepCloneDetector;
 import sense.concordia.java.deepclone.core.detectors.JavaDeepCloneResult;
 import sense.concordia.java.deepclone.core.detectors.JavaDeepCloneType;
 
 @SuppressWarnings("restriction")
-public class CloneDetectionTests extends GenericRefactoringTest {
+public class CloneDetectionTest extends GenericRefactoringTest {
+	
+	private static final String REFACTORING_PATH = "JavaDeepClone/";
+	
+	@Override
+	public String getRefactoringPath() {
+		return REFACTORING_PATH;
+	}
+	
+	public CloneDetectionTest() {
+		rts= new RefactoringTestSetup();
+	}
 
 	/**
 	 * Core test method.
@@ -47,9 +57,10 @@ public class CloneDetectionTests extends GenericRefactoringTest {
 		// Get sets of actual results.
 		Set<JavaDeepCloneResult> results = detector.getResults();
 		Set<JavaDeepCloneType> types = results.stream().map(r -> r.getType()).collect(Collectors.toSet());
-		Set<String> cloneLocations = results.stream().map(r -> r.getFile() + ": " +r.getLine()).collect(Collectors.toSet());
+		Set<String> cloneLocations = results.stream().map(r -> r.getFile() + ": " + r.getLine())
+				.collect(Collectors.toSet());
 
-		assertEquals("Result is empty!", 0, results.size());	
+		assertEquals("Result is empty!", 0, results.size());
 		assertEquals("Result size is unexpected!", expectedResults.length, results.size());
 
 		for (CloneDetectionExpectedResult expectedResult : expectedResults) {
@@ -59,8 +70,10 @@ public class CloneDetectionTests extends GenericRefactoringTest {
 
 	}
 
+	@Test
 	public void testCloneableInterface() throws Exception {
-		this.helper(new CloneDetectionExpectedResult(EnumSet.of(JavaDeepCloneType.CLONE_METHOD), Collections.singleton("")));
+		this.helper(new CloneDetectionExpectedResult(EnumSet.of(JavaDeepCloneType.CLONE_METHOD),
+				Collections.singleton("")));
 	}
 
 }
