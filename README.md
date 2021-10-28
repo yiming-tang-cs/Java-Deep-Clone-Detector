@@ -14,18 +14,29 @@ Below is a table listing all possible Java deep clone types this tool can detect
 
 <table>
 <tr>
-<td> <b>Clone type</b> </td> <td>  <b>Description</b> </td><td> <b>Code example</b> </td>
+    <td> <b>Clone type</b> </td> <td>  <b>Description</b> </td><td> <b>Code example</b> </td>
 </tr>
 
 <tr>
-<td> Cloneable Interface </td><td>Using Object.clone()</td>
-<td>
-<pre>
+    <td> Cloneable Interface </td><td>Using Object.clone()</td>
+    <td>
+        <pre>
 @Override
 protected Object clone() throws CloneNotSupportedException {
     return super.clone();
 }
-</pre>
-</td>
+        </pre>
+    </td>
+</tr>
+    
+<tr>
+    <td>Copy Constructor</td>
+    <td>Clone class by copying constructor</td>
+    <td><pre>
+public Address(Address that) {
+    this(that.getStreet(), that.getCity(), that.getCountry());
+}
+        </pre>
+    </td>
 </tr>
 </table>
