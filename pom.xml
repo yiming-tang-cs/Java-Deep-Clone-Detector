@@ -16,12 +16,11 @@
     <module>sense.concordia.java.deepclone.ui</module>
   </modules>
 
-
   <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <tycho-version>2.4.0</tycho-version>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
-  
+
   <repositories>
     <repository>
       <id>eclipse-2021-09</id>
@@ -35,12 +34,6 @@
     </repository>
   </repositories>
 
-
-  <!-- 
-    To build individual bundles, we specify a repository where to find parent pom, 
-    in case it is not in local maven cache already
-    and that parent pom also has fuller individual-bundle profile 
-    defined that is combined with this one. --> 
   <profiles>
     <profile>
       <id>build-individual-bundles</id>
@@ -57,38 +50,37 @@
         </repository>
       </repositories>
       <build>
-      	<plugins>
-      		<plugin>
-      			<groupId>org.eclipse.tycho.extras</groupId>
-      			<artifactId>tycho-p2-extras-plugin</artifactId>
-      			<version>${tycho.version}</version>
-      			<executions>
-      				<execution> <!-- Checks versions are properly bumped from one stream to the other -->
-      					<id>compare-attached-artifacts-with-release</id>
-      					<goals>
-      						<goal>compare-version-with-baselines</goal>
-      					</goals>
-      					<configuration>
-      						<skip>true</skip>
-      					</configuration>
-      				</execution>
-      			</executions>
-      		</plugin>
-      	</plugins>
+        <plugins>
+          <plugin>
+            <groupId>org.eclipse.tycho.extras</groupId>
+            <artifactId>tycho-p2-extras-plugin</artifactId>
+            <version>${tycho.version}</version>
+            <executions>
+              <execution>
+                <id>compare-attached-artifacts-with-release</id>
+                <goals>
+                  <goal>compare-version-with-baselines</goal>
+                </goals>
+                <configuration>
+                  <skip>true</skip>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
       </build>
     </profile>
   </profiles>
 
-<build>
-  <plugins>
-    <plugin>
-      <groupId>org.eclipse.tycho</groupId>
-      <artifactId>tycho-maven-plugin</artifactId>
-      <version>${tycho-version}</version>
-      <extensions>true</extensions>
-    </plugin>
-  </plugins>
-</build>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.eclipse.tycho</groupId>
+        <artifactId>tycho-maven-plugin</artifactId>
+        <version>${tycho-version}</version>
+        <extensions>true</extensions>
+      </plugin>
+    </plugins>
+  </build>
 
 </project>
-
