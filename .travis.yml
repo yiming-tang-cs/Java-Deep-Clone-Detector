@@ -1,6 +1,6 @@
 sudo: false
 language: java
-jdk: oraclejdk12
+jdk: oraclejdk17
 dist: trusty
 cache:
     apt: true
