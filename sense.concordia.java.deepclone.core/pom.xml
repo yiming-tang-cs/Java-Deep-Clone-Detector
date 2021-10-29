@@ -12,13 +12,4 @@
 	<artifactId>sense.concordia.java.deepclone.core</artifactId>
 	<packaging>eclipse-plugin</packaging>
 
-	<!-- https://mvnrepository.com/artifact/org.eclipse.jdt/org.eclipse.jdt.core -->
-	<dependencies>
-	<dependency>
-    	<groupId>org.eclipse.jdt</groupId>
-    	<artifactId>org.eclipse.jdt.core</artifactId>
-    	<version>3.27.0</version>
-	</dependency>
-	</dependencies>
-
 </project>
