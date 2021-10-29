@@ -10,4 +10,4 @@ script: mvn clean verify
 before_install:
   - "export DISPLAY=:99.0"
   - "sh -e /etc/init.d/xvfb start"
-  - "export GTK_VERSION=$(pkg-config --modversion gtk+-3.0 | tr . _| cut -d '_' -f 1-2)"
+  - "export GTK_VERSION=$(pkg-config --modversion gtk+-3.20 | tr . _| cut -d '_' -f 1-2)"
