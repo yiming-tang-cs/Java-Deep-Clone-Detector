@@ -7,6 +7,7 @@ cache:
     directories:
         - $HOME/.m2
 env:
+  - GTK=3.22.30
   - GTK=3.24
 script: mvn clean verify
 before_install:
