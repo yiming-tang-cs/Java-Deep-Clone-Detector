@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <name>Java Deep Clone Detector</name>
+  <url>https://github.com/yiming-tang-cs/Java-Deep-Clone-Detector</url>
+  <description>This is an Eclipse research tool for detecting Java deep clones.</description>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>sense.concordia.java.deepclone</groupId>
+  <artifactId>parent</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
+  <modules>
+    <module>sense.concordia.java.deepclone.core</module>
+    <module>sense.concordia.java.deepclone.tests</module>
+    <module>sense.concordia.java.deepclone.ui</module>
+  </modules>
+<!--  <profiles>
+    <profile>
+      <id>jacoco</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.jacoco</groupId>
+            <artifactId>jacoco-maven-plugin</artifactId>
+            <version>${jacoco-version}</version>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>prepare-agent</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins> -->
+        <!-- <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.eluder.coveralls</groupId>
+              <artifactId>coveralls-maven-plugin</artifactId>
+              <version>4.3.0</version>
+              <configuration>
+                <jacocoReports>
+                  <jacocoReport>${project.basedir}/edu.cuny.hunter.log.tests.report/target/site/jacoco-aggregate/jacoco.xml</jacocoReport>
+                </jacocoReports>
+                <repoToken>HgxfzLRAUne3v7mZO9gsTY6Kd9wFDpzYK</repoToken>
+                <serviceName>travis-pro</serviceName>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement> 
+      </build>
+    </profile>
+  </profiles>-->
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <!-- <jacoco-version>0.7.8</jacoco-version> -->
+  </properties>
+  <repositories>
+    <repository>
+      <id>eclipse-2021-09</id>
+      <layout>p2</layout>
+      <url>https://download.eclipse.org/releases/2021-09/</url>
+    </repository>
+    <repository>
+      <id>2021-09-update</id>
+      <layout>p2</layout>
+      <url>https://download.eclipse.org/eclipse/updates/4.21/</url>
+    </repository>
+  </repositories>
+</project>
+
