@@ -4,18 +4,24 @@
   <url>https://github.com/yiming-tang-cs/Java-Deep-Clone-Detector</url>
   <description>This is an Eclipse research tool for detecting Java deep clones.</description>
   <modelVersion>4.0.0</modelVersion>
+
   <groupId>sense.concordia.java.deepclone</groupId>
   <artifactId>parent</artifactId>
   <version>1.0.0-SNAPSHOT</version>
   <packaging>pom</packaging>
+
   <modules>
     <module>sense.concordia.java.deepclone.core</module>
     <module>sense.concordia.java.deepclone.tests</module>
     <module>sense.concordia.java.deepclone.ui</module>
   </modules>
+
+
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <tycho-version>2.4.0</tycho-version>
   </properties>
+  
   <repositories>
     <repository>
       <id>eclipse-2021-09</id>
@@ -28,5 +34,61 @@
       <url>https://download.eclipse.org/eclipse/updates/4.21/</url>
     </repository>
   </repositories>
+
+
+  <!-- 
+    To build individual bundles, we specify a repository where to find parent pom, 
+    in case it is not in local maven cache already
+    and that parent pom also has fuller individual-bundle profile 
+    defined that is combined with this one. --> 
+  <profiles>
+    <profile>
+      <id>build-individual-bundles</id>
+      <repositories>
+        <repository>
+          <releases>
+            <enabled>true</enabled>
+          </releases>
+          <snapshots>
+            <enabled>true</enabled>
+          </snapshots>
+          <id>eclipse-hosted</id>
+          <url>https://repo.eclipse.org/content/repositories/eclipse/</url>
+        </repository>
+      </repositories>
+      <build>
+      	<plugins>
+      		<plugin>
+      			<groupId>org.eclipse.tycho.extras</groupId>
+      			<artifactId>tycho-p2-extras-plugin</artifactId>
+      			<version>${tycho.version}</version>
+      			<executions>
+      				<execution> <!-- Checks versions are properly bumped from one stream to the other -->
+      					<id>compare-attached-artifacts-with-release</id>
+      					<goals>
+      						<goal>compare-version-with-baselines</goal>
+      					</goals>
+      					<configuration>
+      						<skip>true</skip>
+      					</configuration>
+      				</execution>
+      			</executions>
+      		</plugin>
+      	</plugins>
+      </build>
+    </profile>
+  </profiles>
+
+<build>
+  <plugins>
+    <plugin>
+      <groupId>org.eclipse.tycho</groupId>
+      <artifactId>tycho-maven-plugin</artifactId>
+      <version>${tycho-version}</version>
+      <extensions>true</extensions>
+    </plugin>
+  </plugins>
+</build>
+
 </project>
 
