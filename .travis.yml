@@ -1,13 +1,12 @@
 sudo: false
 language: java
-jdk: oraclejdk17
+jdk: oraclejdk13
 dist: trusty
 cache:
     apt: true
     directories:
         - $HOME/.m2
 env:
-  - GTK=3.22.30
   - GTK=3.24
 script: mvn clean verify
 before_install:
