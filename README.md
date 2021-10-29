@@ -8,7 +8,7 @@ This is an Eclipse research tool for detecting Java deep clones.
 
 Before importing it into Eclipse, please Make sure you can build it from the command line. The command is `mvn clean test`.
 
-Select analyzed projects -> Quick Assess -> Choose command "Detect java deep clone".
+Select analyzed projects -> Quick Assess -> Choose command `Detect java deep clone`.
 
 ## Details
 
