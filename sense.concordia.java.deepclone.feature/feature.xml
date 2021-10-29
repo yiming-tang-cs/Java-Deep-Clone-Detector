@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="sense.concordia.java.deepclone.feature"
+      label="Feature"
+      version="1.0.0.qualifier"
+      provider-name="Concordia University"
+      plugin="sense.concordia.java.deepclone.core">
+
+   <description url="http://www.example.com/description">
+      [Enter Feature Description here.]
+   </description>
+
+   <copyright url="http://www.example.com/copyright">
+      2021 Yiming Tang. All rights reserved.
+   </copyright>
+
+   <license url="http://www.example.com/license">
+      [Enter License Description here.]
+   </license>
+
+</feature>
