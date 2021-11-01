@@ -46,13 +46,33 @@ public class Order {
         number = source.number;
     }
 }
--------------------------------------------
+-----------------------------------------------------------
 for (Order sourceOrder : source.orders) {
     orders.add(new Order(sourceOrder));
 }
         </pre>
     </td>
 </tr>
+	
+<tr>
+    <td>Serialization</td>
+    <td>Using Java serialization</td>
+    <td><pre>
+public class SerializableClass implements Serializable {
+    public SerializableClass deepCopy() throws Exception {
+	// Serialization of object
+	...
+	// De-serialization of object
+	...
+	return copied;
+    }
+}
+-----------------------------------------------------------
+SerializableClass deepCopiedInstance = myClass.deepCopy();
+    </pre>
+    </td>
+</tr>
+	
 </table>
 
 
