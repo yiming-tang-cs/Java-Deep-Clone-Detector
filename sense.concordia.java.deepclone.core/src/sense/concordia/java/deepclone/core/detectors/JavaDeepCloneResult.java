@@ -3,7 +3,6 @@ package sense.concordia.java.deepclone.core.detectors;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
-import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.internal.corext.dom.ASTNodes;
 
 @SuppressWarnings("restriction")
@@ -14,7 +13,7 @@ public class JavaDeepCloneResult {
 	private String file;
 	private int line;
 
-	public JavaDeepCloneResult(MethodInvocation method, JavaDeepCloneType type) {
+	public JavaDeepCloneResult(ASTNode method, JavaDeepCloneType type) {
 		this.setType(type);
 		CompilationUnit cu = (CompilationUnit) method.getRoot();
 		this.setSubject(cu.getJavaElement().getJavaProject().getElementName());
