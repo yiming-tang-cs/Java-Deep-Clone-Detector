@@ -6,8 +6,11 @@ In the real world of OOP practice, a growing concern is that developers use dupl
 
 ## Usage
 
+### Building from the command line
+
 Before importing it into Eclipse, please make sure you can build it from the command line. The command is `mvn clean verify`.
 
+### How to run in Eclipse
 Select analyzed projects -> Quick Assess -> Choose command `Detect java deep clone`.
 
 ## Details
