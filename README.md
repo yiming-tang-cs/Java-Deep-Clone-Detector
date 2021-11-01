@@ -79,3 +79,7 @@ SerializableClass deepCopiedInstance = myClass.deepCopy();
 ## Development platform
 
 This tool is developed on Eclipse for RCP and RAP (version [2021-06](https://www.eclipse.org/downloads/packages/release/2021-06/r)) by using Oracle Java ([JDK 17](https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html)).
+
+## Contact
+
+If you have any additional questions, please contact me via email: <t_yiming@encs.concordia.ca>
