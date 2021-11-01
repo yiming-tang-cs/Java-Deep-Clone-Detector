@@ -28,9 +28,9 @@ Below is a table listing all possible Java deep clone types this tool can detect
         <pre>
 class A implements Cloneable {
     @Override
-	public Object clone() throws CloneNotSupportedException {
-		return super.clone();
-	}
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone();
+    }
     ...
 }
         </pre>
