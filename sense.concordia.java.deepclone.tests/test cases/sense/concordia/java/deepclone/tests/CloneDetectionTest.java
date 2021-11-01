@@ -92,7 +92,7 @@ public class CloneDetectionTest extends GenericRefactoringTest {
 	private void helper(CloneDetectionExpectedResult... expectedResults) throws Exception {
 		ICompilationUnit cu = this.createCUfromTestFile(getPackageP(), "A");
 
-		ASTParser parser = ASTParser.newParser(AST.JLS15);
+		ASTParser parser = ASTParser.newParser(AST.JLS16);
 		parser.setResolveBindings(true);
 		parser.setSource(cu);
 		parser.setKind(ASTParser.K_COMPILATION_UNIT);
@@ -125,6 +125,14 @@ public class CloneDetectionTest extends GenericRefactoringTest {
 		this.helper(new CloneDetectionExpectedResult(EnumSet.of(JavaDeepCloneType.CLONE_METHOD),
 				Collections.singleton("A.java: 20")));
 	}
+	
+	@Test
+	public void testCloneContructor() throws Exception {
+		this.helper(new CloneDetectionExpectedResult(EnumSet.of(JavaDeepCloneType.ClONE_CONSTRUCTOR),
+				Collections.singleton("A.java: 35")));
+	}
+	
+	
 
 	/*
 	 * This method could fix the issue that the bundle has no entry.
