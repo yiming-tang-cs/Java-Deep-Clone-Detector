@@ -107,8 +107,10 @@ public class JavaDeepCloneDetector extends ASTVisitor {
 	 * @return True/False
 	 */
 	private boolean isCloneConstructor(ClassInstanceCreation classInstanceCreation) {
-		String binaryName = classInstanceCreation.resolveTypeBinding().getBinaryName();
-		if (binaryName != null) {
+		ITypeBinding typeBinding = classInstanceCreation.resolveTypeBinding();
+		if (typeBinding != null) {
+			String binaryName = typeBinding.getBinaryName();
+
 			List<Expression> args = classInstanceCreation.arguments();
 			for (Expression arg : args)
 				if (binaryName.equals(arg.resolveTypeBinding().getBinaryName()))
