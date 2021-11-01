@@ -40,7 +40,7 @@ public class JavaDeepCloneDetector extends ASTVisitor {
 	public boolean visit(ClassInstanceCreation classInstanceCreation) {
 		// Check if the code clones constructor
 		if (isCloneConstructor(classInstanceCreation))
-			this.addResult(classInstanceCreation, JavaDeepCloneType.ClONE_CONSTRUCTOR);
+			this.addResult(classInstanceCreation, JavaDeepCloneType.CLONE_CONSTRUCTOR);
 
 		return super.visit(classInstanceCreation);
 	}
