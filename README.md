@@ -38,8 +38,14 @@ protected Object clone() throws CloneNotSupportedException {
     <td>Copy Constructor</td>
     <td>Clone class by copying constructor</td>
     <td><pre>
-public Address(Address that) {
-    this(that.getStreet(), that.getCity(), that.getCountry());
+public class Order {
+    public Order(Order source) {
+        number = source.number;
+    }
+}
+-------------------------------------------
+for (Order sourceOrder : source.orders) {
+    orders.add(new Order(sourceOrder));
 }
         </pre>
     </td>
