@@ -26,9 +26,12 @@ Below is a table listing all possible Java deep clone types this tool can detect
     <td> Cloneable Interface </td><td>Using Object.clone()</td>
     <td>
         <pre>
-@Override
-protected Object clone() throws CloneNotSupportedException {
-    return super.clone();
+class A implements Cloneable {
+    @Override
+	public Object clone() throws CloneNotSupportedException {
+		return super.clone();
+	}
+    ...
 }
         </pre>
     </td>
