@@ -54,3 +54,8 @@ for (Order sourceOrder : source.orders) {
     </td>
 </tr>
 </table>
+
+
+## Development platform
+
+This tool is developed on Eclipse for RCP and RAP (version [2021-06](https://www.eclipse.org/downloads/packages/release/2021-06/r)) by using Oracle Java ([JDK 17](https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html)).
