@@ -30,9 +30,9 @@ public class JavaDeepCloneDetector extends ASTVisitor {
 	@Override
 	public boolean visit(MethodInvocation method) {
 		// Check if the code invokes "clone" method
-		if (isCloneMethod(method))
+		if (isCloneMethod(method)) // Detect cloneable interface
 			this.addResult(method, JavaDeepCloneType.CLONE_METHOD);
-		else if (isSerialization(method))
+		else if (isSerialization(method)) // Detect java serialization
 			this.addResult(method, JavaDeepCloneType.CLONE_SERIALIZATION);
 
 		return super.visit(method);
@@ -103,7 +103,6 @@ public class JavaDeepCloneDetector extends ASTVisitor {
 						return true;
 			}
 		}
-
 		return false;
 	}
 
