@@ -9,6 +9,7 @@ import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MethodInvocation;
+
 import java.util.List;
 
 @SuppressWarnings("unchecked")
@@ -28,12 +29,29 @@ public class JavaDeepCloneDetector extends ASTVisitor {
 
 	@Override
 	public boolean visit(MethodInvocation method) {
-
 		// Check if the code invokes "clone" method
 		if (isCloneMethod(method))
 			this.addResult(method, JavaDeepCloneType.CLONE_METHOD);
+		else if (isSerialization(method))
+			this.addResult(method, JavaDeepCloneType.CLONE_SERIALIZATION);
 
 		return super.visit(method);
+	}
+
+	private boolean isSerialization(MethodInvocation method) {
+		ITypeBinding typeBinding = method.resolveTypeBinding();
+		if (typeBinding != null) {
+			// Get return class of the method
+			ITypeBinding declaringClass = typeBinding.getTypeDeclaration();
+			if (declaringClass != null) {
+				ITypeBinding[] interfaces = declaringClass.getInterfaces();
+				for (ITypeBinding inter : interfaces) {
+					if (inter.getBinaryName().equals("java.io.Serializable"))
+						return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	@Override
