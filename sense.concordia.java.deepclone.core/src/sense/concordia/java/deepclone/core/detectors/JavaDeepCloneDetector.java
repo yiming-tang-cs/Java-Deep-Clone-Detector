@@ -38,6 +38,13 @@ public class JavaDeepCloneDetector extends ASTVisitor {
 		return super.visit(method);
 	}
 
+	/**
+	 * Check if this method is used to serialize the object into bytes and from
+	 * bytes to object again.
+	 * 
+	 * @param method
+	 * @return True/False
+	 */
 	private boolean isSerialization(MethodInvocation method) {
 		ITypeBinding typeBinding = method.resolveTypeBinding();
 		if (typeBinding != null) {
