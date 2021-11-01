@@ -137,6 +137,12 @@ public class CloneDetectionTest extends GenericRefactoringTest {
 		this.helper(new CloneDetectionExpectedResult(EnumSet.of(JavaDeepCloneType.CLONE_SERIALIZATION),
 				Collections.singleton("A.java: 86")));
 	}
+	
+	@Test
+	public void testSerialization2() throws Exception {
+		this.helper(new CloneDetectionExpectedResult(EnumSet.of(JavaDeepCloneType.CLONE_SERIALIZATION),
+				Collections.singleton("A.java: 55")));
+	}
 
 	/*
 	 * This method could fix the issue that the bundle has no entry.
