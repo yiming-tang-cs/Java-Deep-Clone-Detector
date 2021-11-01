@@ -8,6 +8,7 @@ import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
+import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 
 import java.util.List;
@@ -16,6 +17,7 @@ import java.util.List;
 public class JavaDeepCloneDetector extends ASTVisitor {
 
 	private HashSet<JavaDeepCloneResult> results = new HashSet<>();
+	private HashSet<String> serializableMethodNames = new HashSet<>();
 
 	public void detect() {
 
@@ -25,6 +27,21 @@ public class JavaDeepCloneDetector extends ASTVisitor {
 			System.out.println(r.getEnclosingMethod());
 			System.out.println();
 		});
+	}
+
+	@Override
+	public boolean visit(MethodDeclaration method) {
+		if (isSerializationMethodDec(method))
+			this.serializableMethodNames.add(method.getName().getFullyQualifiedName());
+		return super.visit(method);
+	}
+
+	private boolean isSerializationMethodDec(MethodDeclaration method) {
+		String methodBody = method.getBody().toString();
+		if (methodBody.contains("ObjectOutputStream") && methodBody.contains("ObjectInputStream"))
+			return true;
+		else
+			return false;
 	}
 
 	@Override
@@ -46,17 +63,30 @@ public class JavaDeepCloneDetector extends ASTVisitor {
 	 * @return True/False
 	 */
 	private boolean isSerialization(MethodInvocation method) {
+		if (this.serializableMethodNames.contains(method.getName().getFullyQualifiedName()))
+			return true;
+
 		ITypeBinding typeBinding = method.resolveTypeBinding();
 		if (typeBinding != null) {
-			// Get return class of the method
-			ITypeBinding declaringClass = typeBinding.getTypeDeclaration();
-			if (declaringClass != null) {
-				ITypeBinding[] interfaces = declaringClass.getInterfaces();
-				for (ITypeBinding inter : interfaces) {
-					if (inter.getBinaryName().equals("java.io.Serializable"))
-						return true;
-				}
-			}
+			// Check if the class implements Serializable interface
+			ITypeBinding[] interfaces = typeBinding.getInterfaces();
+			if (!this.checkInterfaces(interfaces, "java.io.Serializable"))
+				return false;
+		}
+		return false;
+	}
+
+	/**
+	 * Check if an interface is in the interface array.
+	 * 
+	 * @param interfaces
+	 * @param interString
+	 * @return True/False
+	 */
+	private boolean checkInterfaces(ITypeBinding[] interfaces, String interString) {
+		for (ITypeBinding inter : interfaces) {
+			if (inter.getBinaryName().equals(interString))
+				return true;
 		}
 		return false;
 	}
@@ -98,9 +128,7 @@ public class JavaDeepCloneDetector extends ASTVisitor {
 			IMethodBinding methodBinding = method.resolveMethodBinding();
 			if (methodBinding != null) {
 				ITypeBinding[] interfraces = methodBinding.getDeclaringClass().getInterfaces();
-				for (ITypeBinding inter : interfraces)
-					if (inter.getBinaryName().equals("java.lang.Cloneable"))
-						return true;
+				return this.checkInterfaces(interfraces, "java.lang.Cloneable");
 			}
 		}
 		return false;
@@ -117,6 +145,14 @@ public class JavaDeepCloneDetector extends ASTVisitor {
 	private void addResult(ASTNode method, JavaDeepCloneType type) {
 		JavaDeepCloneResult newResult = new JavaDeepCloneResult(method, type);
 		results.add(newResult);
+	}
+
+	public HashSet<String> getSerializationMethodDec() {
+		return serializableMethodNames;
+	}
+
+	public void setSerializationMethodDec(HashSet<String> serializableMethodNames) {
+		this.serializableMethodNames = serializableMethodNames;
 	}
 
 }
