@@ -6,8 +6,9 @@ import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.Expression;
+import org.eclipse.jdt.core.dom.IMethodBinding;
+import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MethodInvocation;
-
 import java.util.List;
 
 @SuppressWarnings("unchecked")
@@ -62,14 +63,21 @@ public class JavaDeepCloneDetector extends ASTVisitor {
 	}
 
 	/**
-	 * Check if the method "clone" is invoked. May need to improve in the future.
+	 * Check if the method "clone" is invoked.
 	 * 
 	 * @param method
 	 * @return True/False
 	 */
 	private boolean isCloneMethod(MethodInvocation method) {
-		if (method.getName().toString().equals("clone"))
-			return true;
+		if (method.getName().toString().equals("clone")) {
+			IMethodBinding methodBinding = method.resolveMethodBinding();
+			if (methodBinding != null) {
+				ITypeBinding[] interfraces = methodBinding.getDeclaringClass().getInterfaces();
+				for (ITypeBinding inter : interfraces)
+					if (inter.getBinaryName().equals("java.lang.Cloneable"))
+						return true;
+			}
+		}
 
 		return false;
 	}
