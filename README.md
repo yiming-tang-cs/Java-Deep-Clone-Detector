@@ -23,7 +23,7 @@ Below is a table listing all possible Java deep clone types this tool can detect
 </tr>
 
 <tr>
-    <td> Cloneable Interface </td><td>Using Object.clone()</td>
+    <td> Cloneable Interface </td><td>By default, the clone() method does a shallow copy. Developers override Object.clone() for deep clone.</td>
     <td>
         <pre>
 class A implements Cloneable {
