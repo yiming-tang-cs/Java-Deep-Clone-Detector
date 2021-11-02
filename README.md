@@ -15,7 +15,7 @@ Select analyzed projects -> Quick Assess -> Choose command `Detect java deep clo
 
 ## Details
 
-Java deep clone could be implemented using Java's built-in libraries and external libraries. Below is a table listing all possible Java deep clone types that this tool can detect for **Java's built-in libraries**. Note that CI only evaluates a tool's ability for Java's built-in libraries.
+Java deep clone could be implemented using Java's built-in libraries and external libraries. Below is a table listing all possible Java deep clone types that this tool can detect for **Java's built-in libraries**. Note that CI only evaluates the tool's ability for Java's built-in libraries; nevertheless, the test sub-project still contains all tests for both built-in and external libraries.
 
 <table>
 <tr>
