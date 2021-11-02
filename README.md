@@ -17,11 +17,12 @@ Select analyzed projects -> Quick Assess -> Choose command `Detect java deep clo
 
 Java deep clone could be implemented using Java's built-in libraries and external libraries. Below is a table listing all possible Java deep clone types that this tool can detect for **Java's built-in libraries**.
 
-<table>
+
+<table style="width: 100%;">
 <tr>
-    <td> <b>Clone type</b> </td> 
-    <td>  <b>Description</b> </td>
-    <td> <b>Code example</b> </td>
+    <td style="width=20%;"> <b>Clone type</b> </td> 
+    <td style="width=30%;">  <b>Description</b> </td>
+    <td style="width=50%;"> <b>Code example</b> </td>
 </tr>
 
 <tr>
@@ -82,9 +83,9 @@ Following is a table listing all types of Java deep clones that this tool can de
 
 <table>
 <tr>
-    <td> <b>Clone type</b> </td> 
-    <td>  <b>Description</b> </td>
-    <td> <b>Code example</b> </td>
+    <td style="width=20%;"> <b>Clone type</b> </td> 
+    <td style="width=30%;">  <b>Description</b> </td>
+    <td style="width=50%;"> <b>Code example</b> </td>
 </tr>
 
 <tr>
