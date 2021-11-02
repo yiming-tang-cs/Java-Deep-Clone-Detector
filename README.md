@@ -15,11 +15,13 @@ Select analyzed projects -> Quick Assess -> Choose command `Detect java deep clo
 
 ## Details
 
-Below is a table listing all possible Java deep clone types this tool can detect.
+Java deep clone could be implemented using Java's built-in libraries and external libraries. Below is a table listing all possible Java deep clone types that this tool can detect for **Java's built-in libraries**.
 
 <table>
 <tr>
-    <td> <b>Clone type</b> </td> <td>  <b>Description</b> </td><td> <b>Code example</b> </td>
+    <td> <b>Clone type</b> </td> 
+    <td>  <b>Description</b> </td>
+    <td> <b>Code example</b> </td>
 </tr>
 
 <tr>
@@ -69,6 +71,31 @@ public class SerializableClass implements Serializable {
 -----------------------------------------------------------
 SerializableClass deepCopiedInstance = myClass.deepCopy();
     </pre>
+    </td>
+</tr>
+	
+</table>
+
+---
+
+Following is a table listing all types of Java deep clones that this tool can detect for **Java's external libraries**.
+
+<table>
+<tr>
+    <td> <b>Clone type</b> </td> 
+    <td>  <b>Description</b> </td>
+    <td> <b>Code example</b> </td>
+</tr>
+
+<tr>
+    <td>Apache Commons Lang</td>
+    <td>Using SerializationUtils.clone()</td>
+    <td>
+        <pre>
+...
+User deepCopy = (User) SerializationUtils.clone(pm);
+...        
+	</pre>
     </td>
 </tr>
 	
