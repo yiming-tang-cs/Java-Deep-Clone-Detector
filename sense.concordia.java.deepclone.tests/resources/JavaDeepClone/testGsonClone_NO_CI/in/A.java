@@ -2,7 +2,7 @@ package p;
 
 import java.io.Serializable;
 
-import org.apache.commons.lang.SerializationUtils;
+import com.google.gson.Gson;
 
 /**
  * This class requires an external library. It cannot currently be tested
@@ -33,8 +33,9 @@ public class A {
 	}
 
 	public A() {
-		User pm = new User("Prime", "Minister");
-		User deepCopy = (User) SerializationUtils.clone(pm);
+	    User pm = new User("Prime", "Minister");
+	    Gson gson = new Gson();
+	    User deepCopy = gson.fromJson(gson.toJson(pm), User.class);
 		System.out.println("Copied a new user: " + deepCopy.firstName + " " + deepCopy.lastName);
 	}
 
