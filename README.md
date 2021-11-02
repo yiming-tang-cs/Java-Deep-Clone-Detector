@@ -100,12 +100,26 @@ User deepCopy = (User) SerializationUtils.clone(pm);
 </tr>
 
 <tr>
-    <td>Gson</td>
+    <td>Google Gson</td>
     <td>Using gson.fromJson()</td>
     <td>
         <pre>
 Gson gson = new Gson();
 User deepCopy = gson.fromJson(gson.toJson(pm), User.class);     
+	</pre>
+    </td>
+</tr>
+	
+<tr>
+    <td>FasterXML Jackson</td>
+    <td>Using objectMapper
+	    .writeValueAsString()</td>
+    <td>
+        <pre>
+ObjectMapper objectMapper = new ObjectMapper();
+User deepCopy = objectMapper
+	    	      .readValue(objectMapper
+		      .writeValueAsString(pm), User.class);
 	</pre>
     </td>
 </tr>
