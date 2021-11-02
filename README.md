@@ -98,6 +98,17 @@ User deepCopy = (User) SerializationUtils.clone(pm);
 	</pre>
     </td>
 </tr>
+
+<tr>
+    <td>Gson</td>
+    <td>Using gson.fromJson()</td>
+    <td>
+        <pre>
+Gson gson = new Gson();
+User deepCopy = gson.fromJson(gson.toJson(pm), User.class);     
+	</pre>
+    </td>
+</tr>
 	
 </table>
 
