@@ -48,27 +48,35 @@ public class JavaDeepCloneDetector extends ASTVisitor {
 
 	@Override
 	public boolean visit(MethodInvocation method) {
-		// Check if the code invokes "clone" method
-		if (isCloneMethod(method)) // Detect cloneable interface
-			this.addResult(method, JavaDeepCloneType.CLONE_METHOD);
-		else if (isSerialization(method)) // Detect java serialization
+
+		if (method.getName().toString().equals("clone")) {
+			// Check if the code invokes "clone" method
+			if (isCloneMethod(method)) {// Detect cloneable interface
+				this.addResult(method, JavaDeepCloneType.CLONE_METHOD);
+				return super.visit(method);
+			} else if (isApacheCommonsClone(method)) {
+				this.addResult(method, JavaDeepCloneType.CLONE_APACHE_COMMONS);
+				return super.visit(method);
+			}
+		}
+
+		if (isSerialization(method)) // Detect java serialization
 			this.addResult(method, JavaDeepCloneType.CLONE_SERIALIZATION);
-		else if (isApacheCommonsClone(method))
-			this.addResult(method, JavaDeepCloneType.CLONE_APACHE_COMMONS);
 
 		return super.visit(method);
 	}
 
+	/**
+	 * Check if the Apache Commons deep clone method is invoked
+	 * 
+	 * @param method
+	 * @return True/False
+	 */
 	private boolean isApacheCommonsClone(MethodInvocation method) {
-
-		if (method.getName().toString().equals("clone")) {
-			// TODO: check Apache commons example
-			IMethodBinding methodBinding = method.resolveMethodBinding();
-			if (methodBinding != null && methodBinding.getDeclaringClass().getQualifiedName()
-					.equals("org.apache.commons.lang.SerializationUtils"))
-				return true;
-
-		}
+		IMethodBinding methodBinding = method.resolveMethodBinding();
+		if (methodBinding != null && methodBinding.getDeclaringClass().getQualifiedName()
+				.equals("org.apache.commons.lang.SerializationUtils"))
+			return true;
 
 		return false;
 	}
@@ -136,13 +144,12 @@ public class JavaDeepCloneDetector extends ASTVisitor {
 	 * @return True/False
 	 */
 	private boolean isCloneMethod(MethodInvocation method) {
-		if (method.getName().toString().equals("clone")) {
-			IMethodBinding methodBinding = method.resolveMethodBinding();
-			if (methodBinding != null) {
-				ITypeBinding[] interfraces = methodBinding.getDeclaringClass().getInterfaces();
-				if (this.checkInterfaces(interfraces, "java.lang.Cloneable"))
-					return this.checkContentInCloneMethod(method);
-			}
+
+		IMethodBinding methodBinding = method.resolveMethodBinding();
+		if (methodBinding != null) {
+			ITypeBinding[] interfraces = methodBinding.getDeclaringClass().getInterfaces();
+			if (this.checkInterfaces(interfraces, "java.lang.Cloneable"))
+				return this.checkContentInCloneMethod(method);
 		}
 		return false;
 	}
