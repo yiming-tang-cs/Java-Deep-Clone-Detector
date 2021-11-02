@@ -105,7 +105,6 @@ public class CloneDetectionTest extends GenericRefactoringTest {
 		Set<JavaDeepCloneResult> results = detector.getResults();
 
 		// Check the result size.
-		assertNotEquals("Result is empty!", 0, results.size());
 		assertEquals("Result size is unexpected!", expectedResults.length, results.size());
 
 		Set<JavaDeepCloneType> types = results.stream().map(r -> r.getType()).collect(Collectors.toSet());
@@ -122,8 +121,7 @@ public class CloneDetectionTest extends GenericRefactoringTest {
 
 	@Test
 	public void testCloneableInterface() throws Exception {
-		this.helper(new CloneDetectionExpectedResult(EnumSet.of(JavaDeepCloneType.CLONE_METHOD),
-				Collections.singleton("A.java: 20")));
+		this.helper();
 	}
 
 	@Test
@@ -137,7 +135,7 @@ public class CloneDetectionTest extends GenericRefactoringTest {
 		this.helper(new CloneDetectionExpectedResult(EnumSet.of(JavaDeepCloneType.CLONE_SERIALIZATION),
 				Collections.singleton("A.java: 86")));
 	}
-	
+
 	@Test
 	public void testSerialization2() throws Exception {
 		this.helper(new CloneDetectionExpectedResult(EnumSet.of(JavaDeepCloneType.CLONE_SERIALIZATION),

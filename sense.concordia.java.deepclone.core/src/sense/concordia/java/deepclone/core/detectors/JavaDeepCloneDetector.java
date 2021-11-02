@@ -1,5 +1,6 @@
 package sense.concordia.java.deepclone.core.detectors;
 
+import java.util.HashMap;
 import java.util.HashSet;
 
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -10,7 +11,7 @@ import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
-
+import org.eclipse.jdt.core.dom.SimpleName;
 import java.util.List;
 
 @SuppressWarnings("unchecked")
@@ -18,6 +19,8 @@ public class JavaDeepCloneDetector extends ASTVisitor {
 
 	private HashSet<JavaDeepCloneResult> results = new HashSet<>();
 	private HashSet<String> serializableMethodNames = new HashSet<>();
+
+	private HashMap<String, MethodDeclaration> cloneableMethods = new HashMap<>();
 
 	public void detect() {
 
@@ -33,12 +36,29 @@ public class JavaDeepCloneDetector extends ASTVisitor {
 	public boolean visit(MethodDeclaration method) {
 		if (isSerializationMethodDec(method))
 			this.serializableMethodNames.add(method.getName().getFullyQualifiedName());
+
+		if (isCloneableMethod(method.getName()))
+			this.cloneableMethods.put(method.getName().getFullyQualifiedName(), method);
+
 		return super.visit(method);
 	}
 
 	private boolean isSerializationMethodDec(MethodDeclaration method) {
 		String methodBody = method.getBody().toString();
 		if (methodBody.contains("ObjectOutputStream") && methodBody.contains("ObjectInputStream"))
+			return true;
+		else
+			return false;
+	}
+
+	/**
+	 * Check if the method name is "clone" or not.
+	 * 
+	 * @param methodName
+	 * @return
+	 */
+	private boolean isCloneableMethod(SimpleName methodName) {
+		if (methodName.toString().equals("clone"))
 			return true;
 		else
 			return false;
@@ -130,8 +150,27 @@ public class JavaDeepCloneDetector extends ASTVisitor {
 			IMethodBinding methodBinding = method.resolveMethodBinding();
 			if (methodBinding != null) {
 				ITypeBinding[] interfraces = methodBinding.getDeclaringClass().getInterfaces();
-				return this.checkInterfaces(interfraces, "java.lang.Cloneable");
+				if (this.checkInterfaces(interfraces, "java.lang.Cloneable"))
+					return this.checkContentInCloneMethod(method);
 			}
+		}
+		return false;
+	}
+
+	/**
+	 * Check if clone method uses deep clone. This check is very rough and may be
+	 * improved later.
+	 * 
+	 * @param clone method
+	 * @return True/False
+	 */
+	private boolean checkContentInCloneMethod(MethodInvocation method) {
+		String targetMethodName = method.getName().getFullyQualifiedName();
+		if (this.cloneableMethods.containsKey(targetMethodName)) {
+			MethodDeclaration methodDeclaration = cloneableMethods.get(targetMethodName);
+			// Except for super.clone(), there should be at least one more statement
+			if (methodDeclaration.getBody().statements().size() > 1)
+				return true;
 		}
 		return false;
 	}
