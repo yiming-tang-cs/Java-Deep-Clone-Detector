@@ -10,6 +10,7 @@ import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.MethodInvocation;
+
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 
@@ -52,8 +53,24 @@ public class JavaDeepCloneDetector extends ASTVisitor {
 			this.addResult(method, JavaDeepCloneType.CLONE_METHOD);
 		else if (isSerialization(method)) // Detect java serialization
 			this.addResult(method, JavaDeepCloneType.CLONE_SERIALIZATION);
+		else if (isApacheCommonsClone(method))
+			this.addResult(method, JavaDeepCloneType.CLONE_APACHE_COMMONS);
 
 		return super.visit(method);
+	}
+
+	private boolean isApacheCommonsClone(MethodInvocation method) {
+
+		if (method.getName().toString().equals("clone")) {
+			// TODO: check Apache commons example
+			IMethodBinding methodBinding = method.resolveMethodBinding();
+			if (methodBinding != null && methodBinding.getDeclaringClass().getQualifiedName()
+					.equals("org.apache.commons.lang.SerializationUtils"))
+				return true;
+
+		}
+
+		return false;
 	}
 
 	/**
