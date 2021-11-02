@@ -2,34 +2,34 @@ package sense.concordia.java.deepclone.tests;
 
 import org.junit.Test;
 
-import java.util.Set;
-import java.util.EnumSet;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.charset.Charset;
-import java.util.Collections;
 
+import java.util.Set;
+import java.util.EnumSet;
+import java.util.Collections;
 import java.util.stream.Collectors;
 
 import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
 
+import static org.junit.Assert.*;
+
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTParser;
 
-import sense.concordia.java.deepclone.core.detectors.JavaDeepCloneDetector;
-import sense.concordia.java.deepclone.core.detectors.JavaDeepCloneResult;
 import sense.concordia.java.deepclone.core.detectors.JavaDeepCloneType;
+import sense.concordia.java.deepclone.core.detectors.JavaDeepCloneResult;
+import sense.concordia.java.deepclone.core.detectors.JavaDeepCloneDetector;
 
-import static org.junit.Assert.*;
-
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IPackageFragment;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.ui.tests.refactoring.GenericRefactoringTest;
 import org.eclipse.jdt.ui.tests.refactoring.rules.RefactoringTestSetup;
 
