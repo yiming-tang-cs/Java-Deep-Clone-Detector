@@ -5,5 +5,6 @@ public enum JavaDeepCloneType {
 	    CLONE_CONSTRUCTOR,
 	    CLONE_SERIALIZATION,
 	    CLONE_APACHE_COMMONS,
-	    CLONE_GSON
+	    CLONE_GSON,
+	    CLONE_JACKSON
 }

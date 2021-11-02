@@ -65,6 +65,11 @@ public class JavaDeepCloneDetector extends ASTVisitor {
 				this.addResult(method, JavaDeepCloneType.CLONE_GSON);
 				return super.visit(method);
 			}
+		} else if (methodName.equals("readValue")) {
+			if (isJacksonCloneMethod(method)) {
+				this.addResult(method, JavaDeepCloneType.CLONE_JACKSON);
+				return super.visit(method);
+			}
 		}
 
 		if (isSerialization(method)) // Detect java serialization
@@ -74,10 +79,24 @@ public class JavaDeepCloneDetector extends ASTVisitor {
 	}
 
 	/**
+	 * Check if the Jackson deep clone method is invoked.
+	 * 
+	 * @param method
+	 * @return True/False
+	 */
+	private boolean isJacksonCloneMethod(MethodInvocation method) {
+		IMethodBinding methodBinding = method.resolveMethodBinding();
+		if (methodBinding != null && methodBinding.getDeclaringClass().getQualifiedName()
+				.equals("com.fasterxml.jackson.databind.ObjectMapper"))
+			return true;
+		return false;
+	}
+
+	/**
 	 * Check if the Gson deep clone method is invoked.
 	 * 
 	 * @param method
-	 * @return
+	 * @return True/False
 	 */
 	private boolean isGsonCloneMethod(MethodInvocation method) {
 		IMethodBinding methodBinding = method.resolveMethodBinding();
