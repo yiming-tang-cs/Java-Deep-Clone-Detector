@@ -26,12 +26,11 @@ Below is a table listing all possible Java deep clone types this tool can detect
     <td> Cloneable Interface </td><td>By default, the clone() method does a shallow copy. Developers override Object.clone() for deep clone.</td>
     <td>
         <pre>
-class A implements Cloneable {
-    @Override
-    public Object clone() throws CloneNotSupportedException {
-        return super.clone();
-    }
-    ...
+@Override
+protected Object clone() throws CloneNotSupportedException {
+    Employee cloned = (Employee) super.clone();
+    cloned.setDepartment((Department) cloned.getDepartment().clone());
+    return cloned;
 }
         </pre>
     </td>
