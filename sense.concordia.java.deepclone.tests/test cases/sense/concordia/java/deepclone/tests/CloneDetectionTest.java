@@ -24,6 +24,7 @@ import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTParser;
 
 import sense.concordia.java.deepclone.core.detectors.JavaDeepCloneType;
+import sense.concordia.java.deepclone.core.detectors.JavaMethodDeclarationDetector;
 import sense.concordia.java.deepclone.core.detectors.JavaDeepCloneResult;
 import sense.concordia.java.deepclone.core.detectors.JavaDeepCloneDetector;
 
@@ -98,7 +99,11 @@ public class CloneDetectionTest extends GenericRefactoringTest {
 		parser.setKind(ASTParser.K_COMPILATION_UNIT);
 		ASTNode ast = parser.createAST(new NullProgressMonitor());
 
-		JavaDeepCloneDetector detector = new JavaDeepCloneDetector();
+		JavaMethodDeclarationDetector methodDeclarationDetector = new JavaMethodDeclarationDetector();
+		ast.accept(methodDeclarationDetector);
+		JavaDeepCloneDetector detector = new JavaDeepCloneDetector(
+				methodDeclarationDetector.getSerializableMethodNames(),
+				methodDeclarationDetector.getCloneableMethods());
 		ast.accept(detector);
 
 		// Get sets of actual results.
@@ -146,6 +151,12 @@ public class CloneDetectionTest extends GenericRefactoringTest {
 	public void testSerialization2() throws Exception {
 		this.helper(new CloneDetectionExpectedResult(EnumSet.of(JavaDeepCloneType.CLONE_SERIALIZATION),
 				Collections.singleton("A.java: 55")));
+	}
+
+	@Test
+	public void testSerialization3() throws Exception {
+		this.helper(new CloneDetectionExpectedResult(EnumSet.of(JavaDeepCloneType.CLONE_SERIALIZATION),
+				Collections.singleton("A.java: 73")));
 	}
 
 	/*

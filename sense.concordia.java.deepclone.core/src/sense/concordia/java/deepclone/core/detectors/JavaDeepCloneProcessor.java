@@ -6,27 +6,29 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.internal.corext.refactoring.util.RefactoringASTParser;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 
 @SuppressWarnings("restriction")
 public class JavaDeepCloneProcessor {
-	
+
 	private IJavaProject[] javaProjects;
-	
+
 	/**
-	 * Constructor. 
+	 * Constructor.
+	 * 
 	 * @param javaProjects: the selected java projects.
 	 */
 	public JavaDeepCloneProcessor(IJavaProject[] javaProjects) {
 		this.javaProjects = javaProjects;
 	}
-	
 
 	/**
-	 * The method to process the selected projects.
-	 * It analyzes the AST of each files and visits each AST node.
+	 * The method to process the selected projects. It analyzes the AST of each
+	 * files and visits each AST node.
+	 * 
 	 * @return a status of detection.
 	 * @throws JavaModelException
 	 */
@@ -36,39 +38,35 @@ public class JavaDeepCloneProcessor {
 
 		for (IJavaProject jproj : this.getJavaProjects()) {
 
-			JavaDeepCloneDetector detector = new JavaDeepCloneDetector();
+			// A detector to scan all method declarations.
+			JavaMethodDeclarationDetector methodDeclarationDetector = new JavaMethodDeclarationDetector();
+			acceptDetector(jproj, methodDeclarationDetector);
 
-			IPackageFragmentRoot[] roots = jproj.getPackageFragmentRoots();
-			for (IPackageFragmentRoot root : roots) {
-				IJavaElement[] children = root.getChildren();
-				for (IJavaElement child : children)
-					if (child.getElementType() == IJavaElement.PACKAGE_FRAGMENT) {
-						IPackageFragment fragment = (IPackageFragment) child;
-						ICompilationUnit[] units = fragment.getCompilationUnits();
-						for (ICompilationUnit unit : units) {
-							CompilationUnit compilationUnit = RefactoringASTParser.parseWithASTProvider(unit, true, null);
-							compilationUnit.accept(detector);
-						}
-					}
-			}
-
+			// A detector to detect method invocation for deep clone.
+			JavaDeepCloneDetector detector = new JavaDeepCloneDetector(
+					methodDeclarationDetector.getSerializableMethodNames(),
+					methodDeclarationDetector.getCloneableMethods());
+			acceptDetector(jproj, detector);
 			detector.detect();
 		}
 
-//		// get the status of each J.U.L log invocation.
-//		RefactoringStatus collectedStatus = this.getLogInvocationSet().stream().map(LogInvocation::getStatus)
-//				.collect(() -> new RefactoringStatus(), (a, b) -> a.merge(b), (a, b) -> a.merge(b));
-//
-//		status.merge(collectedStatus);
-//
-//
-//		if (!status.hasFatalError()) {
-//			if (logInvocationSet.isEmpty() && logInvocationSlf4j.isEmpty()) {
-//				status.addWarning(Messages.NoInputLogInvs);
-//			}
-//		}
-
 		return status;
+	}
+
+	private void acceptDetector(IJavaProject jproj, ASTVisitor visitor) throws JavaModelException {
+		IPackageFragmentRoot[] roots = jproj.getPackageFragmentRoots();
+		for (IPackageFragmentRoot root : roots) {
+			IJavaElement[] children = root.getChildren();
+			for (IJavaElement child : children)
+				if (child.getElementType() == IJavaElement.PACKAGE_FRAGMENT) {
+					IPackageFragment fragment = (IPackageFragment) child;
+					ICompilationUnit[] units = fragment.getCompilationUnits();
+					for (ICompilationUnit unit : units) {
+						CompilationUnit compilationUnit = RefactoringASTParser.parseWithASTProvider(unit, true, null);
+						compilationUnit.accept(visitor);
+					}
+				}
+		}
 	}
 
 	private IJavaProject[] getJavaProjects() {

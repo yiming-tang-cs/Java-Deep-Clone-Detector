@@ -7,7 +7,6 @@ import java.util.HashSet;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Expression;
-import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.MethodInvocation;
@@ -18,9 +17,23 @@ import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 public class JavaDeepCloneDetector extends ASTVisitor {
 
 	private HashSet<JavaDeepCloneResult> results = new HashSet<>();
+
 	private HashSet<String> serializableMethodNames = new HashSet<>();
 
 	private HashMap<String, MethodDeclaration> cloneableMethods = new HashMap<>();
+
+	/**
+	 * Constructor.
+	 * 
+	 * @param serializableMethodNames: the method declaration for serialization.
+	 * @param cloneableMethods:        the method declaration to override
+	 *                                 Object.clone().
+	 */
+	public JavaDeepCloneDetector(HashSet<String> serializableMethodNames,
+			HashMap<String, MethodDeclaration> cloneableMethods) {
+		this.serializableMethodNames = serializableMethodNames;
+		this.cloneableMethods = cloneableMethods;
+	}
 
 	public void detect() {
 
@@ -30,38 +43,6 @@ public class JavaDeepCloneDetector extends ASTVisitor {
 			System.out.println(r.getEnclosingMethod());
 			System.out.println();
 		});
-	}
-
-	@Override
-	public boolean visit(MethodDeclaration method) {
-		if (isSerializationMethodDec(method))
-			this.serializableMethodNames.add(method.getName().getFullyQualifiedName());
-
-		if (isCloneableMethod(method.getName()))
-			this.cloneableMethods.put(method.getName().getFullyQualifiedName(), method);
-
-		return super.visit(method);
-	}
-
-	private boolean isSerializationMethodDec(MethodDeclaration method) {
-		String methodBody = method.getBody().toString();
-		if (methodBody.contains("ObjectOutputStream") && methodBody.contains("ObjectInputStream"))
-			return true;
-		else
-			return false;
-	}
-
-	/**
-	 * Check if the method name is "clone" or not.
-	 * 
-	 * @param methodName
-	 * @return
-	 */
-	private boolean isCloneableMethod(SimpleName methodName) {
-		if (methodName.toString().equals("clone"))
-			return true;
-		else
-			return false;
 	}
 
 	@Override
@@ -85,14 +66,6 @@ public class JavaDeepCloneDetector extends ASTVisitor {
 	private boolean isSerialization(MethodInvocation method) {
 		if (this.serializableMethodNames.contains(method.getName().getFullyQualifiedName()))
 			return true;
-
-		ITypeBinding typeBinding = method.resolveTypeBinding();
-		if (typeBinding != null) {
-			// Check if the class implements Serializable interface
-			ITypeBinding[] interfaces = typeBinding.getInterfaces();
-			if (!this.checkInterfaces(interfaces, "java.io.Serializable"))
-				return false;
-		}
 		return false;
 	}
 
