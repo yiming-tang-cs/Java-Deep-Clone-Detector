@@ -49,7 +49,9 @@ public class JavaDeepCloneDetector extends ASTVisitor {
 	@Override
 	public boolean visit(MethodInvocation method) {
 
-		if (method.getName().toString().equals("clone")) {
+		String methodName = method.getName().toString();
+
+		if (methodName.equals("clone")) {
 			// Check if the code invokes "clone" method
 			if (isCloneMethod(method)) {// Detect cloneable interface
 				this.addResult(method, JavaDeepCloneType.CLONE_METHOD);
@@ -58,12 +60,31 @@ public class JavaDeepCloneDetector extends ASTVisitor {
 				this.addResult(method, JavaDeepCloneType.CLONE_APACHE_COMMONS);
 				return super.visit(method);
 			}
+		} else if (methodName.equals("fromJson")) {
+			if (isGsonCloneMethod(method)) {
+				this.addResult(method, JavaDeepCloneType.CLONE_GSON);
+				return super.visit(method);
+			}
 		}
 
 		if (isSerialization(method)) // Detect java serialization
 			this.addResult(method, JavaDeepCloneType.CLONE_SERIALIZATION);
 
 		return super.visit(method);
+	}
+
+	/**
+	 * Check if the Gson deep clone method is invoked.
+	 * 
+	 * @param method
+	 * @return
+	 */
+	private boolean isGsonCloneMethod(MethodInvocation method) {
+		IMethodBinding methodBinding = method.resolveMethodBinding();
+		if (methodBinding != null
+				&& methodBinding.getDeclaringClass().getQualifiedName().equals("com.google.gson.Gson"))
+			return true;
+		return false;
 	}
 
 	/**
