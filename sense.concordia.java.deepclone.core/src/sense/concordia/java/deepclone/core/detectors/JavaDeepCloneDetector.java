@@ -1,9 +1,12 @@
 package sense.concordia.java.deepclone.core.detectors;
 
 import java.util.List;
+import java.util.logging.Logger;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 
+import org.apache.commons.csv.CSVPrinter;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Expression;
@@ -11,11 +14,16 @@ import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 
+import sense.concordia.java.deepclone.core.util.LoggerNames;
+import sense.concordia.java.deepclone.core.util.PrintUtil;
+
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 
 @SuppressWarnings("unchecked")
 public class JavaDeepCloneDetector extends ASTVisitor {
+
+	private static final Logger LOGGER = Logger.getLogger(LoggerNames.LOGGER_NAME);
 
 	private HashSet<JavaDeepCloneResult> results = new HashSet<>();
 
@@ -37,13 +45,21 @@ public class JavaDeepCloneDetector extends ASTVisitor {
 	}
 
 	public void detect() {
-
-		/// TODO: add CSV printer.
-		results.forEach(r -> {
-			System.out.println(r.getSubject() + ": " + r.getType() + ", " + r.getFile() + ", " + r.getLine());
-			System.out.println(r.getEnclosingMethod());
-			System.out.println();
-		});
+		if (!this.results.isEmpty()) {
+			try {
+				// Print results into a CSV file.
+				CSVPrinter resultPrinter = PrintUtil.createCSVPrinter("result.csv", "subject", "clone type", "file",
+						"source code line", "enclosing method");
+				for (JavaDeepCloneResult r : this.results) {
+					resultPrinter.printRecord(r.getSubject(), r.getType(), r.getFile(), r.getLine(),
+							r.getEnclosingMethod());
+				}
+				resultPrinter.close();
+			} catch (IOException e) {
+				LOGGER.severe("There is a problem writing CSV files!");
+			}
+		}
+		LOGGER.info("-----------Detection finished!-----------");
 	}
 
 	@Override

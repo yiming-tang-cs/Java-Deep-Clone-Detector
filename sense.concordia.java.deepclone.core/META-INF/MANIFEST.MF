@@ -12,3 +12,5 @@ Import-Package: org.eclipse.jdt.core,
  org.eclipse.jdt.internal.corext.refactoring.util
 Export-Package: sense.concordia.java.deepclone.core.detectors,
  sense.concordia.java.deepclone.core.util
+Bundle-ClassPath: .,
+ lib/commons-csv-1.6.jar
