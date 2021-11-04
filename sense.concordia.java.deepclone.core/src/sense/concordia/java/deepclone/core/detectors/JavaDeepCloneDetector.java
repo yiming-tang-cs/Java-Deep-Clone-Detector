@@ -159,9 +159,11 @@ public class JavaDeepCloneDetector extends ASTVisitor {
 		if (typeBinding != null) {
 			String binaryName = typeBinding.getBinaryName();
 
+			// If the method has many parameters, it means that in addition to the clone, it
+			// has extra features. Thus, we only consider one parameter.
 			List<Expression> args = classInstanceCreation.arguments();
-			for (Expression arg : args)
-				if (binaryName.equals(arg.resolveTypeBinding().getBinaryName()))
+			if (args.size() == 1)
+				if (binaryName.equals(args.get(0).resolveTypeBinding().getBinaryName()))
 					return true;
 		}
 		return false;
