@@ -13,6 +13,9 @@ Before importing it into Eclipse, please make sure you can build it from the com
 ### How to run in Eclipse
 Select analyzed projects -> Quick Assess -> Choose command `Detect java deep clone`.
 
+### Results
+All results are saved in a `result.csv` file in the tool's working directory.
+
 ## Details
 
 Java deep clone could be implemented using Java's built-in libraries and external libraries. Below is a table listing all possible Java deep clone types that this tool can detect for **Java's built-in libraries**. Note that CI only evaluates the tool's ability for Java's built-in libraries; nevertheless, the test sub-project still contains all tests for both built-in and external libraries.
