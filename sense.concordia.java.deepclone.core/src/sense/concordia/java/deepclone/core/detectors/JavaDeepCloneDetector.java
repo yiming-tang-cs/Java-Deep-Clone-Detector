@@ -48,11 +48,11 @@ public class JavaDeepCloneDetector extends ASTVisitor {
 		if (!this.results.isEmpty()) {
 			try {
 				// Print results into a CSV file.
-				CSVPrinter resultPrinter = PrintUtil.createCSVPrinter("result.csv", "subject", "clone type", "file",
-						"source code line", "enclosing method");
+				CSVPrinter resultPrinter = PrintUtil.createCSVPrinter("result.csv", "subject", "clone method",
+						"clone type", "file", "source code line", "enclosing method");
 				for (JavaDeepCloneResult r : this.results) {
-					resultPrinter.printRecord(r.getSubject(), r.getType(), r.getFile(), r.getLine(),
-							r.getEnclosingMethod());
+					resultPrinter.printRecord(r.getSubject(), r.getMethodInvocation(), r.getType(), r.getFile(),
+							r.getLine(), r.getEnclosingMethod());
 				}
 				resultPrinter.close();
 			} catch (IOException e) {

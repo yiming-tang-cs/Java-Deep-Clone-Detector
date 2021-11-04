@@ -9,6 +9,7 @@ import org.eclipse.jdt.internal.corext.dom.ASTNodes;
 public class JavaDeepCloneResult {
 	private JavaDeepCloneType type;
 	private String enclosingMethod;
+	private String methodInvocation;
 	private String subject;
 	private String file;
 	private int line;
@@ -20,6 +21,7 @@ public class JavaDeepCloneResult {
 		this.setFile(cu.getJavaElement().getPath().makeAbsolute().toString());
 		this.setLine(cu.getLineNumber(method.getStartPosition()));
 
+		this.setMethodInvocation(method.toString());
 		this.setEnclosingMethod(
 				((MethodDeclaration) ASTNodes.getParent(method, ASTNode.METHOD_DECLARATION)).toString());
 	}
@@ -62,6 +64,14 @@ public class JavaDeepCloneResult {
 
 	public void setEnclosingMethod(String enclosingMethod) {
 		this.enclosingMethod = enclosingMethod;
+	}
+
+	public String getMethodInvocation() {
+		return methodInvocation;
+	}
+
+	public void setMethodInvocation(String methodInvocation) {
+		this.methodInvocation = methodInvocation;
 	}
 
 }
