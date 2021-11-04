@@ -7,7 +7,6 @@ import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.SimpleName;
-import org.eclipse.jdt.internal.corext.refactoring.structure.MoveInstanceMethodProcessor.MethodBodyRewriter;
 
 public class JavaMethodDeclarationDetector extends ASTVisitor {
 

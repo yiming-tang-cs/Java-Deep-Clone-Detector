@@ -22,8 +22,12 @@ public class JavaDeepCloneResult {
 		this.setLine(cu.getLineNumber(method.getStartPosition()));
 
 		this.setMethodInvocation(method.toString());
-		this.setEnclosingMethod(
-				((MethodDeclaration) ASTNodes.getParent(method, ASTNode.METHOD_DECLARATION)).toString());
+
+		MethodDeclaration methodDec = (MethodDeclaration) ASTNodes.getParent(method, ASTNode.METHOD_DECLARATION);
+		if (methodDec != null) {
+			this.setEnclosingMethod(
+					((MethodDeclaration) ASTNodes.getParent(method, ASTNode.METHOD_DECLARATION)).toString());
+		}
 	}
 
 	public JavaDeepCloneType getType() {

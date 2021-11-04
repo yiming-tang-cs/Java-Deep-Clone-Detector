@@ -212,11 +212,11 @@ public class JavaDeepCloneDetector extends ASTVisitor {
 
 	private void addResult(ASTNode method, JavaDeepCloneType type) {
 		JavaDeepCloneResult newResult = new JavaDeepCloneResult(method, type);
-		results.add(newResult);
+		this.results.add(newResult);
 	}
 
 	public HashSet<String> getSerializationMethodDec() {
-		return serializableMethodNames;
+		return this.serializableMethodNames;
 	}
 
 	public void setSerializationMethodDec(HashSet<String> serializableMethodNames) {
