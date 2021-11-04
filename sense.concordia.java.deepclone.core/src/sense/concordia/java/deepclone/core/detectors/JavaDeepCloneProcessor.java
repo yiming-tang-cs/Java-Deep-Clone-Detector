@@ -1,5 +1,10 @@
 package sense.concordia.java.deepclone.core.detectors;
 
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.logging.Logger;
+
+import org.apache.commons.csv.CSVPrinter;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
@@ -11,8 +16,13 @@ import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.internal.corext.refactoring.util.RefactoringASTParser;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 
+import sense.concordia.java.deepclone.core.util.LoggerNames;
+import sense.concordia.java.deepclone.core.util.PrintUtil;
+
 @SuppressWarnings("restriction")
 public class JavaDeepCloneProcessor {
+
+	private static final Logger LOGGER = Logger.getLogger(LoggerNames.LOGGER_NAME);
 
 	private IJavaProject[] javaProjects;
 
@@ -31,13 +41,19 @@ public class JavaDeepCloneProcessor {
 	 * 
 	 * @return a status of detection.
 	 * @throws JavaModelException
+	 * @throws IOException
 	 */
-	public RefactoringStatus process() throws JavaModelException {
+	public RefactoringStatus process() throws JavaModelException, IOException {
 
 		final RefactoringStatus status = new RefactoringStatus();
 
+		// Print results into a CSV file.
+		CSVPrinter resultPrinter = PrintUtil.createCSVPrinter("result.csv", "subject", "clone method", "clone type",
+				"file", "source code line", "enclosing method");
+
 		for (IJavaProject jproj : this.getJavaProjects()) {
 
+			LOGGER.info("-----------Start to detect " + jproj.getElementName() + "!-----------");
 			// A detector to scan all method declarations.
 			JavaMethodDeclarationDetector methodDeclarationDetector = new JavaMethodDeclarationDetector();
 			acceptDetector(jproj, methodDeclarationDetector);
@@ -47,8 +63,19 @@ public class JavaDeepCloneProcessor {
 					methodDeclarationDetector.getSerializableMethodNames(),
 					methodDeclarationDetector.getCloneableMethods());
 			acceptDetector(jproj, detector);
-			detector.detect();
+
+			// Get results and print them into a CSV file.
+			HashSet<JavaDeepCloneResult> results = detector.getResults();
+			if (!results.isEmpty()) {
+				for (JavaDeepCloneResult r : results) {
+					resultPrinter.printRecord(r.getSubject(), r.getMethodInvocation(), r.getType(), r.getFile(),
+							r.getLine(), r.getEnclosingMethod());
+				}
+			}
+			LOGGER.info("-----------End to detect " + jproj.getElementName() + "!-----------");
 		}
+
+		resultPrinter.close();
 
 		return status;
 	}

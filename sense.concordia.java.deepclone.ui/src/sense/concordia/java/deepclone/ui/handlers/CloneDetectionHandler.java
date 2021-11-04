@@ -1,5 +1,6 @@
 package sense.concordia.java.deepclone.ui.handlers;
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -55,12 +56,15 @@ public class CloneDetectionHandler extends AbstractHandler {
 					MessageDialog.openError(shell, Messages.Name, Messages.NoProjects);
 				else {
 					Util.deepclonedetect(javaProjectSet.toArray(new IJavaProject[javaProjectSet.size()]));
-					
+
 				}
 
 			} catch (JavaModelException e) {
 				JavaPlugin.log(e);
-				throw new ExecutionException("Failed to detect deep clone!", e);
+				throw new ExecutionException("Failed to bind Java model!", e);
+			} catch (IOException e) {
+				JavaPlugin.log(e);
+				throw new ExecutionException("Failed to create CSV file or write CSV file!", e);
 			}
 		return null;
 
