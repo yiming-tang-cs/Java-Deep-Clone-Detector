@@ -14,7 +14,8 @@ Before importing it into Eclipse, please make sure you can build it from the com
 Select analyzed projects -> Quick Assess -> Choose command `Detect java deep clone`.
 
 ### Results
-All results are saved in a `result.csv` file in the tool's working directory.
+- All detection results are saved in a `result.csv` file in the tool's working directory.
+- The summary of results can be found in `summary.csv`.
 
 ## Details
 
