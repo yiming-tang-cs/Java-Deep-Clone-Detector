@@ -18,6 +18,7 @@ import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 
 import sense.concordia.java.deepclone.core.util.LoggerNames;
 import sense.concordia.java.deepclone.core.util.PrintUtil;
+import sense.concordia.java.deepclone.core.util.TimeCollector;
 
 @SuppressWarnings("restriction")
 public class JavaDeepCloneProcessor {
@@ -49,11 +50,16 @@ public class JavaDeepCloneProcessor {
 
 		// Print results into a CSV file.
 		CSVPrinter resultPrinter = PrintUtil.createCSVPrinter("result.csv", "subject", "clone method", "clone type",
-				"file", "source code line", "enclosing method");
+				"file", "source code line", "enclosing method", "time (s)");
+		CSVPrinter summaryPrinter = PrintUtil.createCSVPrinter("summary.csv", "subject", "clone methods", "time (s)");
 
 		for (IJavaProject jproj : this.getJavaProjects()) {
 
 			LOGGER.info("-----------Start to detect " + jproj.getElementName() + "!-----------");
+			// collect running time.
+			TimeCollector resultsTimeCollector = new TimeCollector();
+			resultsTimeCollector.start();
+
 			// A detector to scan all method declarations.
 			JavaMethodDeclarationDetector methodDeclarationDetector = new JavaMethodDeclarationDetector();
 			acceptDetector(jproj, methodDeclarationDetector);
@@ -72,10 +78,13 @@ public class JavaDeepCloneProcessor {
 							r.getLine(), r.getEnclosingMethod());
 				}
 			}
+			resultsTimeCollector.stop();
+			summaryPrinter.printRecord(jproj.getElementName(), results.size(), resultsTimeCollector.getCollectedTime());
 			LOGGER.info("-----------End to detect " + jproj.getElementName() + "!-----------");
 		}
 
 		resultPrinter.close();
+		summaryPrinter.close();
 
 		return status;
 	}
