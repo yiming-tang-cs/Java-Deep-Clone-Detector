@@ -4,8 +4,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 import org.eclipse.jdt.core.dom.ASTVisitor;
+import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.SimpleName;
+import org.eclipse.jdt.internal.corext.refactoring.structure.MoveInstanceMethodProcessor.MethodBodyRewriter;
 
 public class JavaMethodDeclarationDetector extends ASTVisitor {
 
@@ -25,12 +27,15 @@ public class JavaMethodDeclarationDetector extends ASTVisitor {
 	}
 
 	private boolean isSerializationMethodDec(MethodDeclaration method) {
-		String methodBody = method.getBody().toString();
-		if (methodBody.contains("ObjectOutputStream") && methodBody.contains("ObjectInputStream")
-				&& methodBody.contains("ByteArrayOutputStream") && methodBody.contains("ByteArrayInputStream"))
-			return true;
-		else
-			return false;
+		Block methodBodyBlock = method.getBody();
+		if (methodBodyBlock != null) {
+			String methodBody = methodBodyBlock.toString();
+			if (methodBody.contains("ObjectOutputStream") && methodBody.contains("ObjectInputStream")
+					&& methodBody.contains("ByteArrayOutputStream") && methodBody.contains("ByteArrayInputStream"))
+				return true;
+		}
+
+		return false;
 	}
 
 	/**
