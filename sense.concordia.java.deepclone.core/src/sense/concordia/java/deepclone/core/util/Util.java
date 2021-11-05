@@ -1,6 +1,8 @@
 package sense.concordia.java.deepclone.core.util;
 
 import java.io.IOException;
+import java.util.PrimitiveIterator.OfDouble;
+
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.JavaModelException;
@@ -86,7 +88,7 @@ public final class Util {
 		}
 
 	}
-	
+
 	/**
 	 * Get the full qualified name of the method.
 	 * 
@@ -100,6 +102,8 @@ public final class Util {
 			return projectName + "." + method.getType().toString();
 		else {
 			IMethod methodElement = (IMethod) methodbinding.getJavaElement();
+			if (methodElement == null)
+				return projectName + "." + method.getType().toString();
 			return projectName + "." + methodElement.getDeclaringType().getFullyQualifiedName();
 		}
 
