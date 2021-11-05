@@ -20,7 +20,7 @@ public class A {
 		students.put("222", "Bob");
 		HashMap<String, String> graders = new HashMap<>(students);
 		if (!graders.isEmpty())
-			graders.forEach((no, name) -> System.out.println("Student " + no + ": " + name));
+			System.out.println(graders.size());
 	}
 
 }
