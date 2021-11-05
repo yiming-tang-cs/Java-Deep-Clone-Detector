@@ -130,6 +130,11 @@ public class CloneDetectionTest extends GenericRefactoringTest {
 	}
 
 	@Test
+	public void testHashMap() throws Exception {
+		this.helper();
+	}
+
+	@Test
 	public void testCloneableInterface2() throws Exception {
 		this.helper(new CloneDetectionExpectedResult(EnumSet.of(JavaDeepCloneType.CLONE_METHOD),
 				Collections.singleton("A.java: 61")));
