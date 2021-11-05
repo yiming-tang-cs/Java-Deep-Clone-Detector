@@ -73,8 +73,7 @@ public class JavaDeepCloneProcessor {
 			resultsTimeCollector.start();
 
 			// A detector to scan all method declarations.
-			JavaMethodDeclarationDetector methodDeclarationDetector = new JavaMethodDeclarationDetector(
-					jproj.getElementName());
+			JavaMethodDeclarationDetector methodDeclarationDetector = new JavaMethodDeclarationDetector();
 			acceptDetector(jproj, methodDeclarationDetector);
 
 			resultsTimeCollector.stop();
@@ -98,7 +97,7 @@ public class JavaDeepCloneProcessor {
 
 			// A detector to detect method invocation for deep clone.
 			JavaDeepCloneDetector detector = new JavaDeepCloneDetector(this.serializableMethodNames,
-					this.cloneableMethods, this.constructors, jproj.getElementName());
+					this.cloneableMethods, this.constructors);
 			acceptDetector(jproj, detector);
 
 			// Get results and print them into a CSV file.

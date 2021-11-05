@@ -1,8 +1,6 @@
 package sense.concordia.java.deepclone.core.util;
 
 import java.io.IOException;
-import java.util.PrimitiveIterator.OfDouble;
-
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.JavaModelException;
@@ -60,15 +58,9 @@ public final class Util {
 	 * @param method
 	 * @return method name.
 	 */
-	public static String getMethodFQN(String projectName, MethodDeclaration method) {
+	public static String getMethodFQN(MethodDeclaration method) {
 		IMethodBinding methodbinding = method.resolveBinding();
-		if (methodbinding == null)
-			return projectName + "." + method.getName().toString();
-		else {
-			IMethod methodElement = (IMethod) methodbinding.getJavaElement();
-			return projectName + "." + methodElement.getDeclaringType().getFullyQualifiedName();
-		}
-
+		return getMethodIdentifier(methodbinding, method.getName().toString());
 	}
 
 	/**
@@ -78,15 +70,9 @@ public final class Util {
 	 * @param method
 	 * @return method name.
 	 */
-	public static String getMethodFQN(String projectName, MethodInvocation method) {
+	public static String getMethodFQN(MethodInvocation method) {
 		IMethodBinding methodbinding = method.resolveMethodBinding();
-		if (methodbinding == null)
-			return projectName + "." + method.getName().toString();
-		else {
-			IMethod methodElement = (IMethod) methodbinding.getJavaElement();
-			return projectName + "." + methodElement.getDeclaringType().getFullyQualifiedName();
-		}
-
+		return getMethodIdentifier(methodbinding, method.getName().toString());
 	}
 
 	/**
@@ -96,17 +82,20 @@ public final class Util {
 	 * @param method
 	 * @return method name.
 	 */
-	public static String getMethodFQN(String projectName, ClassInstanceCreation method) {
+	public static String getMethodFQN(ClassInstanceCreation method) {
 		IMethodBinding methodbinding = method.resolveConstructorBinding();
+		return getMethodIdentifier(methodbinding, method.getType().toString());
+	}
+
+	private static String getMethodIdentifier(IMethodBinding methodbinding, String methodname) {
 		if (methodbinding == null)
-			return projectName + "." + method.getType().toString();
+			return methodname;
 		else {
 			IMethod methodElement = (IMethod) methodbinding.getJavaElement();
 			if (methodElement == null)
-				return projectName + "." + method.getType().toString();
-			return projectName + "." + methodElement.getDeclaringType().getFullyQualifiedName();
+				return methodname;
+			return methodElement.getHandleIdentifier();
 		}
-
 	}
 
 }

@@ -19,8 +19,6 @@ import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 @SuppressWarnings("unchecked")
 public class JavaDeepCloneDetector extends ASTVisitor {
 
-	private String projectName;
-
 	private HashSet<JavaDeepCloneResult> results = new HashSet<>();
 
 	// Store all related method declarations from the first scanning
@@ -36,11 +34,10 @@ public class JavaDeepCloneDetector extends ASTVisitor {
 	 *                                 Object.clone().
 	 */
 	public JavaDeepCloneDetector(HashSet<String> serializableMethodNames,
-			HashMap<String, MethodDeclaration> cloneableMethods, HashSet<String> constructors, String projectName) {
+			HashMap<String, MethodDeclaration> cloneableMethods, HashSet<String> constructors) {
 		this.serializableMethodNames = serializableMethodNames;
 		this.cloneableMethods = cloneableMethods;
 		this.constructors = constructors;
-		this.setProjectName(projectName);
 	}
 
 	@Override
@@ -139,7 +136,7 @@ public class JavaDeepCloneDetector extends ASTVisitor {
 	 * @return True/False
 	 */
 	private boolean isSerialization(MethodInvocation method) {
-		if (this.serializableMethodNames.contains(Util.getMethodFQN(this.projectName, method)))
+		if (this.serializableMethodNames.contains(Util.getMethodFQN(method)))
 			return true;
 		return false;
 	}
@@ -175,7 +172,7 @@ public class JavaDeepCloneDetector extends ASTVisitor {
 	 * @return True/False
 	 */
 	private boolean isCloneConstructor(ClassInstanceCreation classInstanceCreation) {
-		String constructorName = Util.getMethodFQN(projectName, classInstanceCreation);
+		String constructorName = Util.getMethodFQN(classInstanceCreation);
 		if (this.constructors.contains(constructorName)) {
 
 			ITypeBinding typeBinding = classInstanceCreation.resolveTypeBinding();
@@ -218,7 +215,7 @@ public class JavaDeepCloneDetector extends ASTVisitor {
 	 * @return True/False
 	 */
 	private boolean checkContentInCloneMethod(MethodInvocation method) {
-		String targetMethodName = Util.getMethodFQN(projectName, method);
+		String targetMethodName = Util.getMethodFQN(method);
 		if (this.cloneableMethods.containsKey(targetMethodName)) {
 			MethodDeclaration methodDeclaration = cloneableMethods.get(targetMethodName);
 			// Except for super.clone(), there should be at least one more statement
@@ -256,14 +253,6 @@ public class JavaDeepCloneDetector extends ASTVisitor {
 
 	public void setConstructors(HashSet<String> constructors) {
 		this.constructors = constructors;
-	}
-
-	public String getProjectName() {
-		return projectName;
-	}
-
-	public void setProjectName(String projectName) {
-		this.projectName = projectName;
 	}
 
 }
