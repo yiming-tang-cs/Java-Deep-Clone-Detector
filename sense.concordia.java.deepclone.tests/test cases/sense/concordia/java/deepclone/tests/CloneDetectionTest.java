@@ -99,11 +99,12 @@ public class CloneDetectionTest extends GenericRefactoringTest {
 		parser.setKind(ASTParser.K_COMPILATION_UNIT);
 		ASTNode ast = parser.createAST(new NullProgressMonitor());
 
-		JavaMethodDeclarationDetector methodDeclarationDetector = new JavaMethodDeclarationDetector();
+		String projectName = cu.getJavaProject().getElementName();
+		JavaMethodDeclarationDetector methodDeclarationDetector = new JavaMethodDeclarationDetector(projectName);
 		ast.accept(methodDeclarationDetector);
 		JavaDeepCloneDetector detector = new JavaDeepCloneDetector(
-				methodDeclarationDetector.getSerializableMethodNames(),
-				methodDeclarationDetector.getCloneableMethods());
+				methodDeclarationDetector.getSerializableMethodNames(), methodDeclarationDetector.getCloneableMethods(),
+				methodDeclarationDetector.getConstructors(), projectName);
 		ast.accept(detector);
 
 		// Get sets of actual results.

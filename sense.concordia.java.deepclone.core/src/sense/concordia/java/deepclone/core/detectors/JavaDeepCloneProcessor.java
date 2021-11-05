@@ -1,6 +1,7 @@
 package sense.concordia.java.deepclone.core.detectors;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.logging.Logger;
 
@@ -13,6 +14,7 @@ import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.internal.corext.refactoring.util.RefactoringASTParser;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 
@@ -26,6 +28,12 @@ public class JavaDeepCloneProcessor {
 	private static final Logger LOGGER = Logger.getLogger(LoggerNames.LOGGER_NAME);
 
 	private IJavaProject[] javaProjects;
+
+	// Store all related method declarations.
+	private HashMap<String, MethodDeclaration> cloneableMethods = new HashMap<>();
+	private HashSet<String> serializableMethodNames = new HashSet<>();
+	private HashSet<String> constructors = new HashSet<>();
+	private HashMap<String, Double> subjectToTime = new HashMap<>();
 
 	/**
 	 * Constructor.
@@ -55,6 +63,31 @@ public class JavaDeepCloneProcessor {
 
 		int projectSize = this.getJavaProjects().length;
 		int projectCounting = 1;
+
+		///////////////////// Get all related method declarations from source code
+		LOGGER.info("-----------Start to preprocessing!-----------");
+		for (IJavaProject jproj : this.getJavaProjects()) {
+
+			// collect running time.
+			TimeCollector resultsTimeCollector = new TimeCollector();
+			resultsTimeCollector.start();
+
+			// A detector to scan all method declarations.
+			JavaMethodDeclarationDetector methodDeclarationDetector = new JavaMethodDeclarationDetector(
+					jproj.getElementName());
+			acceptDetector(jproj, methodDeclarationDetector);
+
+			resultsTimeCollector.stop();
+			subjectToTime.put(jproj.getElementName(), resultsTimeCollector.getCollectedTime());
+
+			this.serializableMethodNames.addAll(methodDeclarationDetector.getSerializableMethodNames());
+			this.cloneableMethods.putAll(methodDeclarationDetector.getCloneableMethods());
+			this.constructors.addAll(methodDeclarationDetector.getConstructors());
+
+		}
+		LOGGER.info("-----------End to preprocessing!-----------");
+
+		///////////////////// Start to evaluate
 		for (IJavaProject jproj : this.getJavaProjects()) {
 
 			LOGGER.info("-----------Start to detect [" + projectCounting + "/" + projectSize + "] "
@@ -63,14 +96,9 @@ public class JavaDeepCloneProcessor {
 			TimeCollector resultsTimeCollector = new TimeCollector();
 			resultsTimeCollector.start();
 
-			// A detector to scan all method declarations.
-			JavaMethodDeclarationDetector methodDeclarationDetector = new JavaMethodDeclarationDetector();
-			acceptDetector(jproj, methodDeclarationDetector);
-
 			// A detector to detect method invocation for deep clone.
-			JavaDeepCloneDetector detector = new JavaDeepCloneDetector(
-					methodDeclarationDetector.getSerializableMethodNames(),
-					methodDeclarationDetector.getCloneableMethods());
+			JavaDeepCloneDetector detector = new JavaDeepCloneDetector(this.serializableMethodNames,
+					this.cloneableMethods, this.constructors, jproj.getElementName());
 			acceptDetector(jproj, detector);
 
 			// Get results and print them into a CSV file.
@@ -82,7 +110,8 @@ public class JavaDeepCloneProcessor {
 				}
 			}
 			resultsTimeCollector.stop();
-			summaryPrinter.printRecord(jproj.getElementName(), results.size(), resultsTimeCollector.getCollectedTime());
+			summaryPrinter.printRecord(jproj.getElementName(), results.size(),
+					resultsTimeCollector.getCollectedTime() + subjectToTime.get(jproj.getElementName()));
 
 			LOGGER.info("-----------End to detect [" + projectCounting + "/" + projectSize + "] "
 					+ jproj.getElementName() + "!-----------");
@@ -113,6 +142,38 @@ public class JavaDeepCloneProcessor {
 
 	private IJavaProject[] getJavaProjects() {
 		return this.javaProjects;
+	}
+
+	public HashSet<String> getSerializableMethodNames() {
+		return serializableMethodNames;
+	}
+
+	public void setSerializableMethodNames(HashSet<String> serializableMethodNames) {
+		this.serializableMethodNames = serializableMethodNames;
+	}
+
+	public HashMap<String, MethodDeclaration> getCloneableMethods() {
+		return cloneableMethods;
+	}
+
+	public void setCloneableMethods(HashMap<String, MethodDeclaration> cloneableMethods) {
+		this.cloneableMethods = cloneableMethods;
+	}
+
+	public HashMap<String, Double> getSubjectToTime() {
+		return subjectToTime;
+	}
+
+	public void setSubjectToTime(HashMap<String, Double> subjectToTime) {
+		this.subjectToTime = subjectToTime;
+	}
+
+	public HashSet<String> getConstructors() {
+		return constructors;
+	}
+
+	public void setConstructors(HashSet<String> constructors) {
+		this.constructors = constructors;
 	}
 
 }

@@ -8,19 +8,32 @@ import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.SimpleName;
 
+import sense.concordia.java.deepclone.core.util.Util;
+
 public class JavaMethodDeclarationDetector extends ASTVisitor {
 
-	private HashSet<String> serializableMethodNames = new HashSet<>();
-
 	private HashMap<String, MethodDeclaration> cloneableMethods = new HashMap<>();
+	private HashSet<String> serializableMethodNames = new HashSet<>();
+	private HashSet<String> constructors = new HashSet<String>();
+
+	private String projectName;
+
+	public JavaMethodDeclarationDetector(String projectName) {
+		this.setProjectName(projectName);
+	}
 
 	@Override
 	public boolean visit(MethodDeclaration method) {
-		if (isSerializationMethodDec(method))
-			this.serializableMethodNames.add(method.getName().getFullyQualifiedName());
-
-		if (isCloneableMethod(method.getName()))
-			this.cloneableMethods.put(method.getName().getFullyQualifiedName(), method);
+		if (isSerializationMethodDec(method)) {
+			String methodName = Util.getMethodFQN(projectName, method);
+			this.serializableMethodNames.add(methodName);
+		} else if (isCloneableMethod(method.getName())) {
+			String methodName = Util.getMethodFQN(projectName, method);
+			this.cloneableMethods.put(methodName, method);
+		} else if (method.isConstructor()) {
+			String methodName = Util.getMethodFQN(projectName, method);
+			this.constructors.add(methodName);
+		}
 
 		return super.visit(method);
 	}
@@ -56,5 +69,21 @@ public class JavaMethodDeclarationDetector extends ASTVisitor {
 
 	public HashMap<String, MethodDeclaration> getCloneableMethods() {
 		return this.cloneableMethods;
+	}
+
+	public HashSet<String> getConstructors() {
+		return constructors;
+	}
+
+	public void setConstructors(HashSet<String> constructors) {
+		this.constructors = constructors;
+	}
+
+	public String getProjectName() {
+		return projectName;
+	}
+
+	public void setProjectName(String projectName) {
+		this.projectName = projectName;
 	}
 }

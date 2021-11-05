@@ -19,10 +19,13 @@ import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 @SuppressWarnings("unchecked")
 public class JavaDeepCloneDetector extends ASTVisitor {
 
+	private String projectName;
+
 	private HashSet<JavaDeepCloneResult> results = new HashSet<>();
 
+	// Store all related method declarations from the first scanning
+	private HashSet<String> constructors = new HashSet<>();
 	private HashSet<String> serializableMethodNames = new HashSet<>();
-
 	private HashMap<String, MethodDeclaration> cloneableMethods = new HashMap<>();
 
 	/**
@@ -33,9 +36,11 @@ public class JavaDeepCloneDetector extends ASTVisitor {
 	 *                                 Object.clone().
 	 */
 	public JavaDeepCloneDetector(HashSet<String> serializableMethodNames,
-			HashMap<String, MethodDeclaration> cloneableMethods) {
+			HashMap<String, MethodDeclaration> cloneableMethods, HashSet<String> constructors, String projectName) {
 		this.serializableMethodNames = serializableMethodNames;
 		this.cloneableMethods = cloneableMethods;
+		this.constructors = constructors;
+		this.setProjectName(projectName);
 	}
 
 	@Override
@@ -134,7 +139,7 @@ public class JavaDeepCloneDetector extends ASTVisitor {
 	 * @return True/False
 	 */
 	private boolean isSerialization(MethodInvocation method) {
-		if (this.serializableMethodNames.contains(method.getName().getFullyQualifiedName()))
+		if (this.serializableMethodNames.contains(Util.getMethodFQN(this.projectName, method)))
 			return true;
 		return false;
 	}
@@ -170,16 +175,20 @@ public class JavaDeepCloneDetector extends ASTVisitor {
 	 * @return True/False
 	 */
 	private boolean isCloneConstructor(ClassInstanceCreation classInstanceCreation) {
-		ITypeBinding typeBinding = classInstanceCreation.resolveTypeBinding();
-		if (typeBinding != null) {
-			String binaryName = typeBinding.getBinaryName();
+		String constructorName = Util.getMethodFQN(projectName, classInstanceCreation);
+		if (this.constructors.contains(constructorName)) {
 
-			// If the method has many parameters, it means that in addition to the clone, it
-			// has extra features. Thus, we only consider one parameter.
-			List<Expression> args = classInstanceCreation.arguments();
-			if (args.size() == 1)
-				if (binaryName.equals(args.get(0).resolveTypeBinding().getBinaryName()))
-					return true;
+			ITypeBinding typeBinding = classInstanceCreation.resolveTypeBinding();
+			if (typeBinding != null) {
+
+				String binaryName = typeBinding.getBinaryName();
+
+				List<Expression> args = classInstanceCreation.arguments();
+				for (Expression arg : args)
+					if (binaryName.equals(arg.resolveTypeBinding().getBinaryName()))
+						return true;
+			}
+
 		}
 		return false;
 	}
@@ -209,10 +218,11 @@ public class JavaDeepCloneDetector extends ASTVisitor {
 	 * @return True/False
 	 */
 	private boolean checkContentInCloneMethod(MethodInvocation method) {
-		String targetMethodName = method.getName().getFullyQualifiedName();
+		String targetMethodName = Util.getMethodFQN(projectName, method);
 		if (this.cloneableMethods.containsKey(targetMethodName)) {
 			MethodDeclaration methodDeclaration = cloneableMethods.get(targetMethodName);
 			// Except for super.clone(), there should be at least one more statement
+			// TODO: enhance detection algorithm here.
 			if (methodDeclaration.getBody().statements().size() > 1)
 				return true;
 		}
@@ -238,6 +248,22 @@ public class JavaDeepCloneDetector extends ASTVisitor {
 
 	public void setSerializationMethodDec(HashSet<String> serializableMethodNames) {
 		this.serializableMethodNames = serializableMethodNames;
+	}
+
+	public HashSet<String> getConstructors() {
+		return constructors;
+	}
+
+	public void setConstructors(HashSet<String> constructors) {
+		this.constructors = constructors;
+	}
+
+	public String getProjectName() {
+		return projectName;
+	}
+
+	public void setProjectName(String projectName) {
+		this.projectName = projectName;
 	}
 
 }
