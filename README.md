@@ -1,4 +1,4 @@
-# Java-Deep-Clone-Detector
+# :maple_leaf: Java-Deep-Clone-Detector
 [![Build Status](https://app.travis-ci.com/yiming-tang-cs/Java-Deep-Clone-Detector.svg?token=gywSHb5G1W81zrovzorQ&branch=master)](https://app.travis-ci.com/yiming-tang-cs/Java-Deep-Clone-Detector)
 ## Introduction
 
