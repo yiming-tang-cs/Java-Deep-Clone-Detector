@@ -11,6 +11,8 @@ import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 
+import sense.concordia.java.deepclone.core.util.Util;
+
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 
@@ -46,19 +48,28 @@ public class JavaDeepCloneDetector extends ASTVisitor {
 			if (isCloneMethod(method)) {// Detect cloneable interface
 				this.addResult(method, JavaDeepCloneType.CLONE_METHOD);
 				return super.visit(method);
-			} else if (isApacheCommonsClone(method)) {
+			}
+			if (isApacheCommonsClone(method)) {
 				this.addResult(method, JavaDeepCloneType.CLONE_APACHE_COMMONS);
 				return super.visit(method);
 			}
-		} else if (methodName.equals("fromJson")) {
-			if (isGsonCloneMethod(method)) {
-				this.addResult(method, JavaDeepCloneType.CLONE_GSON);
-				return super.visit(method);
+		}
+
+		String enclosingMethod = Util.getEnclosingMethod(method);
+
+		if (!enclosingMethod.isBlank()) {
+			if (methodName.equals("fromJson")) {
+				if (isGsonCloneMethod(method, enclosingMethod)) {
+					this.addResult(method, JavaDeepCloneType.CLONE_GSON);
+					return super.visit(method);
+				}
 			}
-		} else if (methodName.equals("readValue")) {
-			if (isJacksonCloneMethod(method)) {
-				this.addResult(method, JavaDeepCloneType.CLONE_JACKSON);
-				return super.visit(method);
+
+			if (methodName.equals("readValue")) {
+				if (isJacksonCloneMethod(method, enclosingMethod)) {
+					this.addResult(method, JavaDeepCloneType.CLONE_JACKSON);
+					return super.visit(method);
+				}
 			}
 		}
 
@@ -72,12 +83,15 @@ public class JavaDeepCloneDetector extends ASTVisitor {
 	 * Check if the Jackson deep clone method is invoked.
 	 * 
 	 * @param method
+	 * @param enclosingMethod
 	 * @return True/False
 	 */
-	private boolean isJacksonCloneMethod(MethodInvocation method) {
+	private boolean isJacksonCloneMethod(MethodInvocation method, String enclosingMethod) {
 		IMethodBinding methodBinding = method.resolveMethodBinding();
-		if (methodBinding != null && methodBinding.getDeclaringClass().getQualifiedName()
-				.equals("com.fasterxml.jackson.databind.ObjectMapper"))
+		if (methodBinding != null
+				&& methodBinding.getDeclaringClass().getQualifiedName()
+						.equals("com.fasterxml.jackson.databind.ObjectMapper")
+				&& enclosingMethod.contains("writeValueAsString"))
 			return true;
 		return false;
 	}
@@ -86,12 +100,13 @@ public class JavaDeepCloneDetector extends ASTVisitor {
 	 * Check if the Gson deep clone method is invoked.
 	 * 
 	 * @param method
+	 * @param enclosingMethod
 	 * @return True/False
 	 */
-	private boolean isGsonCloneMethod(MethodInvocation method) {
+	private boolean isGsonCloneMethod(MethodInvocation method, String enclosingMethod) {
 		IMethodBinding methodBinding = method.resolveMethodBinding();
-		if (methodBinding != null
-				&& methodBinding.getDeclaringClass().getQualifiedName().equals("com.google.gson.Gson"))
+		if (methodBinding != null && methodBinding.getDeclaringClass().getQualifiedName().equals("com.google.gson.Gson")
+				&& enclosingMethod.contains("toJson"))
 			return true;
 		return false;
 	}

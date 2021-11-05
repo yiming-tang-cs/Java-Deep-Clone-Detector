@@ -2,10 +2,9 @@ package sense.concordia.java.deepclone.core.detectors;
 
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.CompilationUnit;
-import org.eclipse.jdt.core.dom.MethodDeclaration;
-import org.eclipse.jdt.internal.corext.dom.ASTNodes;
 
-@SuppressWarnings("restriction")
+import sense.concordia.java.deepclone.core.util.Util;
+
 public class JavaDeepCloneResult {
 	private JavaDeepCloneType type;
 	private String enclosingMethod;
@@ -22,12 +21,7 @@ public class JavaDeepCloneResult {
 		this.setLine(cu.getLineNumber(method.getStartPosition()));
 
 		this.setMethodInvocation(method.toString());
-
-		MethodDeclaration methodDec = (MethodDeclaration) ASTNodes.getParent(method, ASTNode.METHOD_DECLARATION);
-		if (methodDec != null) {
-			this.setEnclosingMethod(
-					((MethodDeclaration) ASTNodes.getParent(method, ASTNode.METHOD_DECLARATION)).toString());
-		}
+		this.setEnclosingMethod(Util.getEnclosingMethod(method));
 	}
 
 	public JavaDeepCloneType getType() {

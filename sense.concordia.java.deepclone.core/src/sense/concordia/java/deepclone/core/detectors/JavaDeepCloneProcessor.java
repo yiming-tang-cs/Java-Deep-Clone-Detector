@@ -53,9 +53,12 @@ public class JavaDeepCloneProcessor {
 				"file", "source code line", "enclosing method", "time (s)");
 		CSVPrinter summaryPrinter = PrintUtil.createCSVPrinter("summary.csv", "subject", "clone methods", "time (s)");
 
+		int projectSize = this.getJavaProjects().length;
+		int projectCounting = 1;
 		for (IJavaProject jproj : this.getJavaProjects()) {
 
-			LOGGER.info("-----------Start to detect " + jproj.getElementName() + "!-----------");
+			LOGGER.info("-----------Start to detect [" + projectCounting + "/" + projectSize + "] "
+					+ jproj.getElementName() + "!-----------");
 			// collect running time.
 			TimeCollector resultsTimeCollector = new TimeCollector();
 			resultsTimeCollector.start();
@@ -80,7 +83,10 @@ public class JavaDeepCloneProcessor {
 			}
 			resultsTimeCollector.stop();
 			summaryPrinter.printRecord(jproj.getElementName(), results.size(), resultsTimeCollector.getCollectedTime());
-			LOGGER.info("-----------End to detect " + jproj.getElementName() + "!-----------");
+
+			LOGGER.info("-----------End to detect [" + projectCounting + "/" + projectSize + "] "
+					+ jproj.getElementName() + "!-----------");
+			projectCounting++;
 		}
 
 		resultPrinter.close();
