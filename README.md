@@ -2,7 +2,7 @@
 [![Build Status](https://app.travis-ci.com/yiming-tang-cs/Java-Deep-Clone-Detector.svg?token=gywSHb5G1W81zrovzorQ&branch=master)](https://app.travis-ci.com/yiming-tang-cs/Java-Deep-Clone-Detector)
 ## Introduction
 
-In the real-world of OOP practice, a growing concern is that developers use duplicate source code when implementing the same functionality, which results in program redundancy and inefficiency. For example, developers implement their programs using deep clones rather than shallow copies. This is an Eclipse research tool for detecting Java deep clones. With this tool, you can take a look at how the deep clone issue shows up in real-life Java projects.
+In the real-world of OOP practice, a growing concern is that developers use duplicate source code when implementing the same functionality, which results in program redundancy and inefficiency. For example, developers implement their programs using deep clones rather than shallow copies. This is an Eclipse research tool for detecting Java deep clones. With this tool, you can take a look at how the deep clone shows up in real-life Java projects.
 
 ## Usage
 
