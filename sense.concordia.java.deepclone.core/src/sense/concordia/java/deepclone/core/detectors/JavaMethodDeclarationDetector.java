@@ -1,32 +1,40 @@
 package sense.concordia.java.deepclone.core.detectors;
 
-import java.util.HashMap;
 import java.util.HashSet;
 
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Block;
+import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
-import org.eclipse.jdt.core.dom.SimpleName;
 
 import sense.concordia.java.deepclone.core.util.Util;
 
 public class JavaMethodDeclarationDetector extends ASTVisitor {
 
-	private HashMap<String, MethodDeclaration> cloneableMethods = new HashMap<>();
+	private HashSet<String> cloneableMethods = new HashSet<>();
 	private HashSet<String> serializableMethodNames = new HashSet<>();
 	private HashSet<String> constructors = new HashSet<String>();
+
+	// These sets are used to store fully qualified names for interprocedural
+	// analysis
+	private HashSet<String> cloneableMethodsAST = new HashSet<>();
+	private HashSet<String> serializableMethodNamesAST = new HashSet<>();
+	private HashSet<String> constructorsAST = new HashSet<String>();
 
 	@Override
 	public boolean visit(MethodDeclaration method) {
 		if (isSerializationMethodDec(method)) {
-			String methodName = Util.getMethodFQN(method);
-			this.serializableMethodNames.add(methodName);
-		} else if (isCloneableMethod(method.getName())) {
-			String methodName = Util.getMethodFQN(method);
-			this.cloneableMethods.put(methodName, method);
+			String[] methodNames = Util.getMethodFQN(method);
+			this.serializableMethodNames.add(methodNames[0]);
+			this.serializableMethodNamesAST.add(methodNames[1]);
+		} else if (isCloneableMethod(method)) {
+			String[] methodNames = Util.getMethodFQN(method);
+			this.cloneableMethods.add(methodNames[0]);
+			this.cloneableMethodsAST.add(methodNames[1]);
 		} else if (method.isConstructor()) {
-			String methodName = Util.getMethodFQN(method);
-			this.constructors.add(methodName);
+			String[] methodNames = Util.getMethodFQN(method);
+			this.constructors.add(methodNames[0]);
+			this.constructorsAST.add(methodNames[1]);
 		}
 
 		return super.visit(method);
@@ -47,21 +55,40 @@ public class JavaMethodDeclarationDetector extends ASTVisitor {
 	/**
 	 * Check if the method name is "clone" or not.
 	 * 
+	 * This method should be an overriding method.
+	 * 
 	 * @param methodName
-	 * @return
+	 * @return True/False
 	 */
-	private boolean isCloneableMethod(SimpleName methodName) {
-		if (methodName.toString().equals("clone"))
-			return true;
-		else
-			return false;
+	private boolean isCloneableMethod(MethodDeclaration method) {
+		if (method.getName().toString().equals("clone")) {
+
+			// Except for super.clone(), there should be at least one more statement
+			// TODO: enhance detection algorithm here.
+			if (method.getBody().statements().size() <= 1)
+				return false;
+
+			IMethodBinding methodBinding = method.resolveBinding();
+			if (methodBinding != null) {
+				IMethodBinding[] superMethods = methodBinding.getDeclaringClass().getSuperclass().getDeclaredMethods();
+				for (IMethodBinding superMethod : superMethods) {
+					if (methodBinding.getMethodDeclaration().overrides(superMethod))
+						return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	public HashSet<String> getSerializableMethodNames() {
 		return this.serializableMethodNames;
 	}
 
-	public HashMap<String, MethodDeclaration> getCloneableMethods() {
+	public HashSet<String> getSerializableMethodNamesAST() {
+		return this.serializableMethodNamesAST;
+	}
+
+	public HashSet<String> getCloneableMethods() {
 		return this.cloneableMethods;
 	}
 
@@ -72,5 +99,5 @@ public class JavaMethodDeclarationDetector extends ASTVisitor {
 	public void setConstructors(HashSet<String> constructors) {
 		this.constructors = constructors;
 	}
-	
+
 }
