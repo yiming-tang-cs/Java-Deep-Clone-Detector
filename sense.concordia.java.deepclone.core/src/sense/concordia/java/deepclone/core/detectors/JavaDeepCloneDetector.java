@@ -1,6 +1,5 @@
 package sense.concordia.java.deepclone.core.detectors;
 
-import java.util.List;
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -8,18 +7,15 @@ import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
-import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.ImportDeclaration;
 import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.MethodInvocation;
-import org.eclipse.jdt.core.dom.ThisExpression;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
+
 import sense.concordia.java.deepclone.core.util.Util;
 
-import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
-import org.eclipse.jdt.core.dom.CompilationUnit;
 
 @SuppressWarnings("unchecked")
 public class JavaDeepCloneDetector extends ASTVisitor {
@@ -209,21 +205,16 @@ public class JavaDeepCloneDetector extends ASTVisitor {
 	 * @return True/False
 	 */
 	private boolean isCloneConstructor(ClassInstanceCreation classInstanceCreation) {
-		String constructorName = this.getMethodFQN(classInstanceCreation);
-		if (this.constructors.contains(constructorName)) {
+		String[] constructorNames = this.getMethodFQN(classInstanceCreation);
 
-			ITypeBinding typeBinding = classInstanceCreation.resolveTypeBinding();
-			if (typeBinding != null) {
-
-				String binaryName = typeBinding.getBinaryName();
-
-				List<Expression> args = classInstanceCreation.arguments();
-				for (Expression arg : args)
-					if (binaryName.equals(arg.resolveTypeBinding().getBinaryName()))
-						return true;
-			}
-
+		if (constructorNames[0].isBlank()) {
+			if (this.constructorsAST.contains(constructorNames[1]))
+				return true;
+		} else {
+			if (this.constructors.contains(constructorNames[0]))
+				return false;
 		}
+
 		return false;
 	}
 
@@ -235,9 +226,16 @@ public class JavaDeepCloneDetector extends ASTVisitor {
 	 */
 	private boolean isCloneMethod(MethodInvocation method) {
 		String[] targetMethodNames = this.getMethodFQN(method);
-		if (this.cloneableMethods.containsKey(targetMethodName)) {
-			return true;
+
+		if (targetMethodNames[0].isBlank()) // no method binding
+		{
+			if (this.cloneableMethodsAST.contains(targetMethodNames[1]))
+				return true;
+		} else {
+			if (this.cloneableMethods.contains(targetMethodNames[0]))
+				return true;
 		}
+
 		return false;
 	}
 
@@ -253,13 +251,13 @@ public class JavaDeepCloneDetector extends ASTVisitor {
 
 		IMethodBinding methodbinding = method.resolveMethodBinding();
 		String methodname = Util.getMethodIdentifier(methodbinding);
-		if (methodname.isBlank()) {
+		if (methodname.isBlank()) { // no method binding
 			methodNames[0] = "";
 			methodNames[1] = getFQNforMethod(method.getExpression()) + ".java~" + method.getName() + "("
 					+ Util.getParamemterSig(method.arguments()) + ")";//////////////// check
 
 			System.out.println(methodNames[1] + "**********");
-		} else {
+		} else { // method binding exists
 			methodNames[0] = methodname;
 			methodNames[1] = "";
 		}
@@ -267,7 +265,7 @@ public class JavaDeepCloneDetector extends ASTVisitor {
 	}
 
 	private String getFQNforMethod(Expression methodExpression) {
-		String importString = "";
+		String importString = ""; ////// method experssion may not be correct
 		if (this.typeToClass.containsKey(methodExpression.toString())) {
 			String classname = this.typeToClass.get(methodExpression.toString());
 			for (String im : this.imports) {
@@ -303,11 +301,6 @@ public class JavaDeepCloneDetector extends ASTVisitor {
 			methodNames[1] = "";
 		}
 		return methodNames;
-	}
-
-	private static String getMethodPrefix(CompilationUnit root) {
-		// TODO Auto-generated method stub
-		return "";
 	}
 
 	public HashSet<JavaDeepCloneResult> getResults() {

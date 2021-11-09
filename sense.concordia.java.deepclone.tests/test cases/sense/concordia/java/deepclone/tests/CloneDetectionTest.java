@@ -103,7 +103,8 @@ public class CloneDetectionTest extends GenericRefactoringTest {
 		ast.accept(methodDeclarationDetector);
 		JavaDeepCloneDetector detector = new JavaDeepCloneDetector(
 				methodDeclarationDetector.getSerializableMethodNames(), methodDeclarationDetector.getCloneableMethods(),
-				methodDeclarationDetector.getConstructors());
+				methodDeclarationDetector.getConstructors(), methodDeclarationDetector.getSerializableMethodNamesAST(),
+				methodDeclarationDetector.getCloneableMethodsAST(), methodDeclarationDetector.getConstructorsAST());
 		ast.accept(detector);
 
 		// Get sets of actual results.
