@@ -66,9 +66,12 @@ public class JavaMethodDeclarationDetector extends ASTVisitor {
 				System.out.println("Constructor: " + binaryName);
 				List<SingleVariableDeclaration> args = method.parameters();
 				for (SingleVariableDeclaration arg : args) {
-					System.out.println("Constructor arg: " + arg.resolveBinding().getDeclaringClass().getBinaryName());
-					if (binaryName.equals(arg.resolveBinding().getDeclaringClass().getBinaryName()))
-						return true;
+					ITypeBinding declaringclass = arg.resolveBinding().getDeclaringClass();
+					if (declaringclass != null) {
+						System.out.println("Constructor arg: " + declaringclass.getBinaryName());
+						if (binaryName.equals(declaringclass.getBinaryName()))
+							return true;	
+					}
 				}
 			}
 		}
