@@ -58,7 +58,7 @@ public class JavaDeepCloneProcessor {
 
 		// Print results into a CSV file.
 		CSVPrinter resultPrinter = PrintUtil.createCSVPrinter("result.csv", "subject", "clone method", "clone type",
-				"file", "source code line", "enclosing method", "time (s)");
+				"file", "source code line", "enclosing method");
 		CSVPrinter summaryPrinter = PrintUtil.createCSVPrinter("summary.csv", "subject", "clone methods", "time (s)");
 
 		int projectSize = this.getJavaProjects().length;
