@@ -161,7 +161,7 @@ public class JavaDeepCloneDetector extends ASTVisitor {
 		String methodname = Util.getMethodIdentifier(methodbinding);
 
 		if (this.constructors.contains(methodname))
-			return false;
+			return true;
 
 		return false;
 	}
