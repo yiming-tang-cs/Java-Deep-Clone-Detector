@@ -33,10 +33,6 @@ public class JavaDeepCloneProcessor {
 	private HashSet<String> serializableMethodNames = new HashSet<>();
 	private HashSet<String> constructors = new HashSet<>();
 
-	private HashSet<String> cloneableMethodsAST = new HashSet<>();
-	private HashSet<String> serializableMethodNamesAST = new HashSet<>();
-	private HashSet<String> constructorsAST = new HashSet<>();
-
 	private HashMap<String, Double> subjectToTime = new HashMap<>();
 
 	/**
@@ -87,10 +83,6 @@ public class JavaDeepCloneProcessor {
 			this.cloneableMethods.addAll(methodDeclarationDetector.getCloneableMethods());
 			this.constructors.addAll(methodDeclarationDetector.getConstructors());
 
-			this.serializableMethodNamesAST.addAll(methodDeclarationDetector.getSerializableMethodNamesAST());
-			this.cloneableMethodsAST.addAll(methodDeclarationDetector.getCloneableMethodsAST());
-			this.constructorsAST.addAll(methodDeclarationDetector.getConstructorsAST());
-
 		}
 		LOGGER.info("-----------End to preprocessing!-----------");
 
@@ -105,8 +97,7 @@ public class JavaDeepCloneProcessor {
 
 			// A detector to detect method invocation for deep clone.
 			JavaDeepCloneDetector detector = new JavaDeepCloneDetector(this.serializableMethodNames,
-					this.cloneableMethods, this.constructors, this.serializableMethodNamesAST, this.cloneableMethodsAST,
-					this.constructorsAST);
+					this.cloneableMethods, this.constructors);
 			acceptDetector(jproj, detector);
 
 			// Get results and print them into a CSV file.
@@ -182,30 +173,6 @@ public class JavaDeepCloneProcessor {
 
 	public void setConstructors(HashSet<String> constructors) {
 		this.constructors = constructors;
-	}
-
-	public HashSet<String> getCloneableMethodsAST() {
-		return cloneableMethodsAST;
-	}
-
-	public void setCloneableMethodsAST(HashSet<String> cloneableMethodsAST) {
-		this.cloneableMethodsAST = cloneableMethodsAST;
-	}
-
-	public HashSet<String> getSerializableMethodNamesAST() {
-		return serializableMethodNamesAST;
-	}
-
-	public void setSerializableMethodNamesAST(HashSet<String> serializableMethodNamesAST) {
-		this.serializableMethodNamesAST = serializableMethodNamesAST;
-	}
-
-	public HashSet<String> getConstructorsAST() {
-		return constructorsAST;
-	}
-
-	public void setConstructorsAST(HashSet<String> constructorsAST) {
-		this.constructorsAST = constructorsAST;
 	}
 
 }

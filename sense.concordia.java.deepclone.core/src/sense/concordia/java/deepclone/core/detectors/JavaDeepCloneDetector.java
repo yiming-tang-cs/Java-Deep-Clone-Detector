@@ -1,23 +1,16 @@
 package sense.concordia.java.deepclone.core.detectors;
 
-import java.util.HashMap;
 import java.util.HashSet;
 
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
-import org.eclipse.jdt.core.dom.Expression;
-import org.eclipse.jdt.core.dom.FieldDeclaration;
-import org.eclipse.jdt.core.dom.ImportDeclaration;
 import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.MethodInvocation;
-import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
-import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
 import sense.concordia.java.deepclone.core.util.Util;
 
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 
-@SuppressWarnings("unchecked")
 public class JavaDeepCloneDetector extends ASTVisitor {
 
 	private HashSet<JavaDeepCloneResult> results = new HashSet<>();
@@ -27,16 +20,6 @@ public class JavaDeepCloneDetector extends ASTVisitor {
 	private HashSet<String> serializableMethodNames = new HashSet<>();
 	private HashSet<String> cloneableMethods = new HashSet<>();
 
-	// Store all related method declarations from the first scanning
-	private HashSet<String> constructorsAST = new HashSet<>();
-	private HashSet<String> serializableMethodNamesAST = new HashSet<>();
-	private HashSet<String> cloneableMethodsAST = new HashSet<>();
-
-	// Store the importing packages to get the fully qualified names for the methods
-	// declared in them
-	private HashSet<String> imports = new HashSet<>();
-	private HashMap<String, String> typeToClass = new HashMap<>();
-
 	/**
 	 * Constructor.
 	 * 
@@ -45,41 +28,11 @@ public class JavaDeepCloneDetector extends ASTVisitor {
 	 *                                 Object.clone().
 	 */
 	public JavaDeepCloneDetector(HashSet<String> serializableMethodNames, HashSet<String> cloneableMethods,
-			HashSet<String> constructors, HashSet<String> serializableMethodNamesAST,
-			HashSet<String> cloneableMethodsAST, HashSet<String> constructorsAST) {
+			HashSet<String> constructors) {
 		this.serializableMethodNames = serializableMethodNames;
 		this.cloneableMethods = cloneableMethods;
 		this.constructors = constructors;
 
-		this.setSerializableMethodNamesAST(serializableMethodNamesAST);
-		this.setCloneableMethodsAST(cloneableMethodsAST);
-		this.setConstructorsAST(constructorsAST);
-	}
-
-	@Override
-	public boolean visit(ImportDeclaration importDeclaration) {
-		System.out.println(importDeclaration.getName().getFullyQualifiedName());
-		this.imports.add(importDeclaration.getName().getFullyQualifiedName());
-		return super.visit(importDeclaration);
-	}
-
-	@Override
-	public boolean visit(VariableDeclarationFragment variableDeclarationFragment) {
-
-		String type = "";
-
-		ASTNode parent = variableDeclarationFragment.getParent();
-
-		if (parent instanceof VariableDeclarationStatement)
-			type = ((VariableDeclarationStatement) parent).getType().toString();
-
-		if (parent instanceof FieldDeclaration)
-			type = ((FieldDeclaration) parent).getType().toString();
-
-		System.out.println("type???: " + type + "    ////" + variableDeclarationFragment.getName().toString());
-
-		this.typeToClass.put(type, variableDeclarationFragment.getName().toString());
-		return super.visit(variableDeclarationFragment);
 	}
 
 	@Override
@@ -187,14 +140,13 @@ public class JavaDeepCloneDetector extends ASTVisitor {
 	 * @return True/False
 	 */
 	private boolean isSerialization(MethodInvocation method) {
-		String[] methodNames = this.getMethodFQN(method);
-		if (methodNames[0].isBlank()) { // Check names from AST
-			if (this.serializableMethodNamesAST.contains(methodNames[1]))
-				return true;
-		} else { // Check names from Java model
-			if (this.serializableMethodNames.contains(methodNames[0]))
-				return true;
-		}
+		IMethodBinding methodbinding = method.resolveMethodBinding();
+		String methodname = Util.getMethodIdentifier(methodbinding);
+
+		// Check names from Java model
+		if (this.serializableMethodNames.contains(methodname))
+			return true;
+
 		return false;
 	}
 
@@ -205,15 +157,11 @@ public class JavaDeepCloneDetector extends ASTVisitor {
 	 * @return True/False
 	 */
 	private boolean isCloneConstructor(ClassInstanceCreation classInstanceCreation) {
-		String[] constructorNames = this.getMethodFQN(classInstanceCreation);
+		IMethodBinding methodbinding = classInstanceCreation.resolveConstructorBinding();
+		String methodname = Util.getMethodIdentifier(methodbinding);
 
-		if (constructorNames[0].isBlank()) {
-			if (this.constructorsAST.contains(constructorNames[1]))
-				return true;
-		} else {
-			if (this.constructors.contains(constructorNames[0]))
-				return false;
-		}
+		if (this.constructors.contains(methodname))
+			return false;
 
 		return false;
 	}
@@ -225,82 +173,13 @@ public class JavaDeepCloneDetector extends ASTVisitor {
 	 * @return True/False
 	 */
 	private boolean isCloneMethod(MethodInvocation method) {
-		String[] targetMethodNames = this.getMethodFQN(method);
-
-		if (targetMethodNames[0].isBlank()) // no method binding
-		{
-			if (this.cloneableMethodsAST.contains(targetMethodNames[1]))
-				return true;
-		} else {
-			if (this.cloneableMethods.contains(targetMethodNames[0]))
-				return true;
-		}
-
-		return false;
-	}
-
-	/**
-	 * Get the full qualified name of the method.
-	 * 
-	 * @param projectName
-	 * @param method
-	 * @return method name.
-	 */
-	public String[] getMethodFQN(MethodInvocation method) {
-		String[] methodNames = new String[2];
-
 		IMethodBinding methodbinding = method.resolveMethodBinding();
 		String methodname = Util.getMethodIdentifier(methodbinding);
-		if (methodname.isBlank()) { // no method binding
-			methodNames[0] = "";
-			methodNames[1] = getFQNforMethod(method.getExpression()) + ".java~" + method.getName() + "("
-					+ Util.getParamemterSig(method.arguments()) + ")";//////////////// check
 
-			System.out.println(methodNames[1] + "**********");
-		} else { // method binding exists
-			methodNames[0] = methodname;
-			methodNames[1] = "";
-		}
-		return methodNames;
-	}
+		if (this.cloneableMethods.contains(methodname))
+			return true;
 
-	private String getFQNforMethod(Expression methodExpression) {
-		String importString = ""; ////// method experssion may not be correct
-		if (this.typeToClass.containsKey(methodExpression.toString())) {
-			String classname = this.typeToClass.get(methodExpression.toString());
-			for (String im : this.imports) {
-				if (im.contains(classname)) {
-					importString = im;
-					break;
-				}
-			}
-		}
-		return importString;
-	}
-
-	/**
-	 * Get the full qualified name of the method.
-	 * 
-	 * @param projectName
-	 * @param method
-	 * @return method name.
-	 */
-	public String[] getMethodFQN(ClassInstanceCreation method) {
-		String[] methodNames = new String[2];
-
-		IMethodBinding methodbinding = method.resolveConstructorBinding();
-		String methodname = Util.getMethodIdentifier(methodbinding);
-		if (methodname.isBlank()) {
-			methodNames[0] = "";
-			methodNames[1] = getFQNforMethod(method.getExpression()) + ".java~" + method.getType().toString() + "("
-					+ Util.getParamemterSig(method.arguments()) + ")";//////////////// check
-
-			System.out.println(methodNames[1] + "**********");
-		} else {
-			methodNames[0] = methodname;
-			methodNames[1] = "";
-		}
-		return methodNames;
+		return false;
 	}
 
 	public HashSet<JavaDeepCloneResult> getResults() {
@@ -330,30 +209,6 @@ public class JavaDeepCloneDetector extends ASTVisitor {
 
 	public void setConstructors(HashSet<String> constructors) {
 		this.constructors = constructors;
-	}
-
-	public HashSet<String> getConstructorsAST() {
-		return constructorsAST;
-	}
-
-	public void setConstructorsAST(HashSet<String> constructorsAST) {
-		this.constructorsAST = constructorsAST;
-	}
-
-	public HashSet<String> getSerializableMethodNamesAST() {
-		return serializableMethodNamesAST;
-	}
-
-	public void setSerializableMethodNamesAST(HashSet<String> serializableMethodNamesAST) {
-		this.serializableMethodNamesAST = serializableMethodNamesAST;
-	}
-
-	public HashSet<String> getCloneableMethodsAST() {
-		return cloneableMethodsAST;
-	}
-
-	public void setCloneableMethodsAST(HashSet<String> cloneableMethodsAST) {
-		this.cloneableMethodsAST = cloneableMethodsAST;
 	}
 
 }

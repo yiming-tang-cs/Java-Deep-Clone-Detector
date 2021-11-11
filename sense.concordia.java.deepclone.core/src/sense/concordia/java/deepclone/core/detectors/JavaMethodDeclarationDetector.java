@@ -18,26 +18,14 @@ public class JavaMethodDeclarationDetector extends ASTVisitor {
 	private HashSet<String> serializableMethodNames = new HashSet<>();
 	private HashSet<String> constructors = new HashSet<String>();
 
-	// These sets are used to store fully qualified names for interprocedural
-	// analysis
-	private HashSet<String> cloneableMethodsAST = new HashSet<>();
-	private HashSet<String> serializableMethodNamesAST = new HashSet<>();
-	private HashSet<String> constructorsAST = new HashSet<String>();
-
 	@Override
 	public boolean visit(MethodDeclaration method) {
 		if (isSerializationMethodDec(method)) {
-			String[] methodNames = Util.getMethodFQN(method);
-			this.serializableMethodNames.add(methodNames[0]);
-			this.serializableMethodNamesAST.add(methodNames[1]);
+			this.serializableMethodNames.add(Util.getMethodIdentifier(method.resolveBinding()));
 		} else if (isCloneableMethod(method)) {
-			String[] methodNames = Util.getMethodFQN(method);
-			this.cloneableMethods.add(methodNames[0]);
-			this.cloneableMethodsAST.add(methodNames[1]);
+			this.cloneableMethods.add(Util.getMethodIdentifier(method.resolveBinding()));
 		} else if (isValidConstructorMethod(method)) {
-			String[] methodNames = Util.getMethodFQN(method);
-			this.constructors.add(methodNames[0]);
-			this.constructorsAST.add(methodNames[1]);
+			this.constructors.add(Util.getMethodIdentifier(method.resolveBinding()));
 		}
 
 		return super.visit(method);
@@ -70,7 +58,7 @@ public class JavaMethodDeclarationDetector extends ASTVisitor {
 					if (declaringclass != null) {
 						System.out.println("Constructor arg: " + declaringclass.getBinaryName());
 						if (binaryName.equals(declaringclass.getBinaryName()))
-							return true;	
+							return true;
 					}
 				}
 			}
@@ -110,24 +98,12 @@ public class JavaMethodDeclarationDetector extends ASTVisitor {
 		return this.serializableMethodNames;
 	}
 
-	public HashSet<String> getSerializableMethodNamesAST() {
-		return this.serializableMethodNamesAST;
-	}
-
 	public HashSet<String> getCloneableMethods() {
 		return this.cloneableMethods;
-	}
-	
-	public HashSet<String> getCloneableMethodsAST() {
-		return this.cloneableMethodsAST;
 	}
 
 	public HashSet<String> getConstructors() {
 		return this.constructors;
-	}
-	
-	public HashSet<String> getConstructorsAST() {
-		return this.constructorsAST;
 	}
 
 	public void setConstructors(HashSet<String> constructors) {

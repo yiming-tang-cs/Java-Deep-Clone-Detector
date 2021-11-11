@@ -1,17 +1,12 @@
 package sense.concordia.java.deepclone.core.util;
 
 import java.io.IOException;
-import java.util.List;
-
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.ClassInstanceCreation;
-import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
-import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.internal.corext.dom.ASTNodes;
 import sense.concordia.java.deepclone.core.detectors.JavaDeepCloneProcessor;
 
@@ -51,59 +46,6 @@ public final class Util {
 			return methodDec.toString();
 		else
 			return "";
-	}
-
-	/**
-	 * Get the full qualified name of the method.
-	 * 
-	 * @param projectName
-	 * @param method
-	 * @return method names.
-	 */
-	@SuppressWarnings("unchecked")
-	public static String[] getMethodFQN(MethodDeclaration method) {
-		String parameterSig = getParamemterSig(method.parameters());
-
-		System.out.println("methodDec: " + getMethodPrefix((CompilationUnit) method.getRoot()) + method.getName() + "( "
-				+ parameterSig + ")");
-
-		// Store 2 kinds of method names;
-		// The first one is from Java model, the second one is from AST.
-		String[] methodNames = new String[2];
-
-		IMethodBinding methodbinding = method.resolveBinding();
-		methodNames[0] = getMethodIdentifier(methodbinding);
-		methodNames[1] = getMethodPrefix((CompilationUnit) method.getRoot()) + method.getName() + "( " + parameterSig
-				+ ")";
-		return methodNames;
-	}
-
-	private static String getMethodPrefix(CompilationUnit cu) {
-		if (cu.getPackage() != null) {
-			String pkgName = cu.getPackage().getName().toString();
-			return pkgName + "." + cu.getJavaElement().getElementName() + "~";
-		}
-		return "";
-	}
-
-	public static String getParamemterSig(List<SingleVariableDeclaration> parameters) {
-		String parameterSig = "";
-		for (SingleVariableDeclaration p : parameters) {
-			parameterSig += p.getType().toString() + ", ";
-		}
-		return parameterSig;
-	}
-
-	/**
-	 * Get the full qualified name of the method.
-	 * 
-	 * @param projectName
-	 * @param method
-	 * @return method name.
-	 */
-	public static String getMethodFQN(ClassInstanceCreation method) {
-		IMethodBinding methodbinding = method.resolveConstructorBinding();
-		return getMethodIdentifier(methodbinding);
 	}
 
 	public static String getMethodIdentifier(IMethodBinding methodbinding) {
