@@ -76,7 +76,7 @@ public class JavaMethodDeclarationDetector extends ASTVisitor {
 
 			// Except for super.clone(), there should be at least one more statement
 			// TODO: enhance detection algorithm here.
-			if (method.getBody().statements().size() <= 1)
+			if (method.getBody() == null || method.getBody().statements().size() <= 1)
 				return false;
 
 			IMethodBinding methodBinding = method.resolveBinding();
